@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useTransaction } from '@/hooks/useTransaction'
 import { createTransaction } from '@/services/transactionService'
 import type { ITransaction } from '@/types/transaction'
 import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
@@ -11,11 +12,7 @@ import { SelectGroup } from '@radix-ui/react-select'
 import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 
-export interface ITransactionProps {
-	setTransactions: React.Dispatch<React.SetStateAction<ITransaction[]>>
-}
-
-export function TransactionForm({ setTransactions }: ITransactionProps) {
+export function TransactionForm() {
 	const [amount, setAmount] = useState('')
 	const [description, setDescription] = useState('')
 	const [category, setCategory] = useState('')
@@ -23,6 +20,8 @@ export function TransactionForm({ setTransactions }: ITransactionProps) {
 	const [date, setDate] = useState<Date>(new Date())
 	const [isOpen, setIsOpen] = useState(false)
 	const [open, setOpen] = useState(false)
+
+	const { setTransactions } = useTransaction()
 
 	const formatMoney = (input: string) => {
 		let digits = input.replace(/\D/g, '')
@@ -114,7 +113,13 @@ export function TransactionForm({ setTransactions }: ITransactionProps) {
 							<Popover open={open} onOpenChange={setOpen}>
 								<PopoverTrigger asChild>
 									<Button variant="outline" className="w-48 justify-between font-normal">
-										{date ? date.toLocaleDateString() : 'Select date'}
+										{date
+											? date.toLocaleDateString('pt-BR', {
+													day: '2-digit',
+													month: 'long',
+													year: 'numeric',
+												})
+											: 'Select date'}
 										<ChevronDownIcon />
 									</Button>
 								</PopoverTrigger>
@@ -124,6 +129,7 @@ export function TransactionForm({ setTransactions }: ITransactionProps) {
 										selected={date}
 										captionLayout="dropdown"
 										onSelect={(date) => {
+											if (!date) return
 											setDate(date)
 											setOpen(false)
 										}}
@@ -151,7 +157,7 @@ export function TransactionForm({ setTransactions }: ITransactionProps) {
 							Transação
 						</Label>
 						<Select defaultValue="income" onValueChange={(e) => setType(e as 'expense' | 'income')} value={type}>
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger className="w-48">
 								<SelectValue placeholder="Transação" />
 							</SelectTrigger>
 							<SelectContent>
