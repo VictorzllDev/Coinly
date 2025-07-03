@@ -1,43 +1,70 @@
-import { useTransaction } from '@/hooks/useTransaction'
-import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { useMemo, useState } from 'react';
+import { useTransaction } from '@/hooks/useTransaction';
+import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate';
+import { TransactionFilter } from '../TransactionFilter';
+import { TransactionListItems } from '../TransactionListItems';
 
 export const TransactionList = () => {
-	const { transactions } = useTransaction()
-	return (
-		<div className="p-4">
-			<h2 className="mb-4 font-bold text-gray-800 text-xl">Transações Financeiras</h2>
-			<ul className="space-y-3">
-				{transactions.map((transaction) => (
-					<li
-						key={transaction.id}
-						className="flex flex-col justify-between gap-2 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 sm:flex-row"
-					>
-						<div className="flex-1">
-							<div className="flex flex-wrap items-baseline gap-2">
-								<strong className="text-gray-900">{transaction.description}</strong>
-								<span className="rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-800 text-xs">
-									{transaction.category}
-								</span>
-							</div>
-							<div className="mt-1 text-gray-500 text-sm">
-								{firestoreDateToJSDate(transaction.date).toLocaleDateString('pt-BR', {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric',
-								})}
-							</div>
-						</div>
-						<div
-							className={`font-bold text-lg sm:text-base ${
-								transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-							}`}
-						>
-							{transaction.type === 'income' ? '+' : '-'}
-							R$ {Math.abs(transaction.amount).toFixed(2)}
-						</div>
-					</li>
-				))}
-			</ul>
-		</div>
-	)
-}
+  const { transactions } = useTransaction();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [minAmount, setMinAmount] = useState<string>('');
+  const [maxAmount, setMaxAmount] = useState<string>('');
+  const [transactionType, setTransactionType] = useState<'all' | 'income' | 'expense'>('all');
+
+  const filteredTransactions = useMemo(() => {
+    let result = [...transactions];
+
+    if (selectedCategory) {
+      result = result.filter((transaction) => transaction.category === selectedCategory);
+    }
+
+    if (transactionType !== 'all') {
+      result = result.filter((transaction) => transaction.type === transactionType);
+    }
+
+    if (minAmount) {
+      const min = parseFloat(minAmount);
+      result = result.filter((transaction) => Math.abs(transaction.amount) >= min);
+    }
+
+    if (maxAmount) {
+      const max = parseFloat(maxAmount);
+      result = result.filter((transaction) => Math.abs(transaction.amount) <= max);
+    }
+
+    return result;
+  }, [transactions, selectedCategory, transactionType, minAmount, maxAmount]);
+
+  const sortedTransactions = useMemo(() => {
+    return [...filteredTransactions].sort((a, b) => {
+      const dateA = firestoreDateToJSDate(a.date as unknown as Date).getTime();
+      const dateB = firestoreDateToJSDate(b.date as unknown as Date).getTime();
+      return dateB - dateA;
+    });
+  }, [filteredTransactions]);
+
+  return (
+    <div className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-bold text-gray-800 text-xl">Transações Financeiras</h2>
+        <span className="text-gray-500 text-sm">
+          {sortedTransactions.length} transação{sortedTransactions.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <TransactionFilter
+        transactions={transactions}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        minAmount={minAmount}
+        setMinAmount={setMinAmount}
+        maxAmount={maxAmount}
+        setMaxAmount={setMaxAmount}
+        transactionType={transactionType}
+        setTransactionType={setTransactionType}
+      />
+
+      <TransactionListItems transactions={sortedTransactions} />
+    </div>
+  );
+};

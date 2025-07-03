@@ -1,3 +1,4 @@
+import { CurrencyInput } from '@/components/ui/currency-input';
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -22,18 +23,6 @@ export function TransactionForm() {
 	const [open, setOpen] = useState(false)
 
 	const { setTransactions } = useTransaction()
-
-	const formatMoney = (input: string) => {
-		let digits = input.replace(/\D/g, '')
-		digits = digits.padStart(3, '0')
-
-		const formatted = new Intl.NumberFormat('pt-BR', {
-			style: 'currency',
-			currency: 'BRL',
-		}).format(parseFloat(digits) / 100)
-
-		return formatted
-	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -85,9 +74,9 @@ export function TransactionForm() {
 						<Label htmlFor="amount" className="text-right">
 							Valor
 						</Label>
-						<Input
+						<CurrencyInput
 							value={amount}
-							onChange={(e) => setAmount(formatMoney(e.target.value))}
+							onValueChange={(values) => setAmount(values.value)}
 							className="col-span-3"
 							required
 						/>
@@ -118,7 +107,7 @@ export function TransactionForm() {
 													day: '2-digit',
 													month: 'long',
 													year: 'numeric',
-												})
+											  })
 											: 'Select date'}
 										<ChevronDownIcon />
 									</Button>
@@ -129,7 +118,6 @@ export function TransactionForm() {
 										selected={date}
 										captionLayout="dropdown"
 										onSelect={(date) => {
-											if (!date) return
 											setDate(date)
 											setOpen(false)
 										}}
@@ -157,7 +145,7 @@ export function TransactionForm() {
 							Transação
 						</Label>
 						<Select defaultValue="income" onValueChange={(e) => setType(e as 'expense' | 'income')} value={type}>
-							<SelectTrigger className="w-48">
+							<SelectTrigger className="w-[180px]">
 								<SelectValue placeholder="Transação" />
 							</SelectTrigger>
 							<SelectContent>
@@ -177,3 +165,4 @@ export function TransactionForm() {
 		</Dialog>
 	)
 }
+
