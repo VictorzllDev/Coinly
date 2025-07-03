@@ -3,6 +3,6 @@ export interface ITransaction {
 	description: string
 	category: string
 	amount: number
-	date: string
+	date: Date
 	type: 'income' | 'expense'
 }

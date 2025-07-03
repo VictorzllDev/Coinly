@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { TransactionList } from './components/TransactionList'
 import { getTransactions } from './services/transactionService'
 import type { ITransaction } from './types/transaction'
+import { TransactionForm } from './components/TransactionForm'
 
 export function App() {
 	const [transactions, setTransactions] = useState<ITransaction[]>([])
@@ -30,6 +31,7 @@ export function App() {
 		<div className="mx-auto max-w-[600px] p-5">
 			<h1>Minhas Transações</h1>
 			<TransactionList transactions={transactions} />
+			<TransactionForm setTransactions={setTransactions} />
 		</div>
 	)
 }
