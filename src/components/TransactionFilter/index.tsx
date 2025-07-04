@@ -29,7 +29,7 @@ const getCategoryColor = (category: string) => {
 		'bg-red-100 text-red-800',
 		'bg-teal-100 text-teal-800',
 	]
-	const index = Math.abs(category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length
+	const index = Math.abs((category || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length
 	return colors[index]
 }
 
