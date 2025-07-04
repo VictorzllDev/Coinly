@@ -1,6 +1,7 @@
 import { TransactionForm } from './components/TransactionForm'
 import { TransactionList } from './components/TransactionList'
 import { useTransaction } from './hooks/useTransaction'
+import { Header } from './components/Header'
 
 export function App() {
 	const { loading } = useTransaction()
@@ -10,10 +11,12 @@ export function App() {
 	}
 
 	return (
-		<div className="mx-auto max-w-[600px] p-5">
-			<h1>Minhas Transações</h1>
-			<TransactionList />
-			<TransactionForm />
-		</div>
+		<>
+			<Header />
+			<div className="mx-auto p-5">
+				<TransactionList />
+				<TransactionForm />
+			</div>
+		</>
 	)
 }
