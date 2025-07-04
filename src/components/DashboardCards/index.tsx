@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 import { DollarSign, CreditCard, Wallet } from 'lucide-react'
 
 interface DashboardCardsProps {

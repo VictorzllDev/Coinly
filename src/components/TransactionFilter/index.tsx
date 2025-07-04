@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { ITransaction } from '@/types/transaction'
 import { useMemo } from 'react'
+import { TransactionForm } from '../TransactionForm'
 
 interface TransactionFilterProps {
 	transactions: ITransaction[]
@@ -113,6 +114,10 @@ export const TransactionFilter: React.FC<TransactionFilterProps> = ({
 						placeholder="Qualquer valor"
 					/>
 				</div>
+			</div>
+
+			<div className="flex flex-1 justify-end pt-4">
+				<TransactionForm />
 			</div>
 		</div>
 	)

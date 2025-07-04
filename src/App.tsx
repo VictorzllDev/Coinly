@@ -15,7 +15,6 @@ export function App() {
 			<Header />
 			<div className="mx-auto p-5">
 				<TransactionList />
-				<TransactionForm />
 			</div>
 		</>
 	)
