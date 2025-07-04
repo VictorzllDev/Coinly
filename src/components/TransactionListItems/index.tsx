@@ -35,11 +35,7 @@ const getCategoryColor = (category: string) => {
 	return colors[index]
 }
 
-export const TransactionListItems: React.FC<TransactionListItemsProps> = ({
-	transactions,
-	onEdit,
-	onDelete,
-}) => {
+export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ transactions, onEdit, onDelete }) => {
 	if (transactions.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
@@ -85,4 +81,3 @@ export const TransactionListItems: React.FC<TransactionListItemsProps> = ({
 		</ul>
 	)
 }
-

@@ -1,7 +1,14 @@
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -55,7 +62,9 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 		e.preventDefault()
 
 		try {
-			const newAmount = Number(amount.replace(/\D/g, '')) / 100
+			const parseAmount = (value: string) => Number(value.replace(/\D/g, '')) / 100
+
+			const newAmount = parseAmount(amount)
 
 			if (initialData) {
 				await updateTransaction({
@@ -75,10 +84,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 					type,
 				})
 
-				setTransactions((prevTransactions: ITransaction[]) => [
-					createdTransaction,
-					...prevTransactions,
-				])
+				setTransactions((prevTransactions: ITransaction[]) => [createdTransaction, ...prevTransactions])
 			}
 		} catch (error) {
 			console.error(`Error ${initialData ? 'updating' : 'adding'} transaction: `, error)
@@ -147,7 +153,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 													day: '2-digit',
 													month: 'long',
 													year: 'numeric',
-											  })
+												})
 											: 'Select date'}
 										<ChevronDownIcon />
 									</Button>
@@ -205,4 +211,3 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 		</Dialog>
 	)
 }
-

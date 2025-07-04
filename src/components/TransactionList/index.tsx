@@ -5,7 +5,14 @@ import { TransactionFilter } from '../TransactionFilter'
 import { TransactionListItems } from '../TransactionListItems'
 import { TransactionForm } from '../TransactionForm'
 import type { ITransaction } from '@/types/transaction'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+	DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 export const TransactionList = () => {
@@ -90,18 +97,10 @@ export const TransactionList = () => {
 				setTransactionType={setTransactionType}
 			/>
 
-			<TransactionListItems
-				transactions={sortedTransactions}
-				onEdit={handleEdit}
-				onDelete={handleDeleteClick}
-			/>
+			<TransactionListItems transactions={sortedTransactions} onEdit={handleEdit} onDelete={handleDeleteClick} />
 
 			{selectedTransaction && (
-				<TransactionForm
-					open={isEditModalOpen}
-					onOpenChange={setIsEditModalOpen}
-					initialData={selectedTransaction}
-				/>
+				<TransactionForm open={isEditModalOpen} onOpenChange={setIsEditModalOpen} initialData={selectedTransaction} />
 			)}
 
 			<Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
