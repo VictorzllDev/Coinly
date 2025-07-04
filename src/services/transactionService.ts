@@ -31,7 +31,7 @@ export const createTransaction = async (transaction: Omit<ITransaction, 'id'>): 
 }
 
 export const updateTransaction = async (transaction: ITransaction): Promise<ITransaction> => {
-	const docRef = doc(db, 'transactions', transaction.id)
+	const docRef = doc(db, 'transactions', transaction.id!)
 	await updateDoc(docRef, {
 		description: transaction.description,
 		category: transaction.category,

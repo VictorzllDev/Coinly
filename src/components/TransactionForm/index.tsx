@@ -164,8 +164,10 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 										selected={date}
 										captionLayout="dropdown"
 										onSelect={(date) => {
-											setDate(date)
-											setIsCalendarOpen(false)
+											if (date) {
+												setDate(date)
+												setIsCalendarOpen(false)
+											}
 										}}
 										className="rounded-md border"
 									/>
