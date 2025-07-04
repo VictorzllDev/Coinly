@@ -44,7 +44,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 
 	useEffect(() => {
 		if (initialData) {
-			setAmount(String(initialData.amount * 100))
+			setAmount(String(initialData.amount))
 			setDescription(initialData.description)
 			setCategory(initialData.category)
 			setType(initialData.type)
