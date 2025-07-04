@@ -25,7 +25,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
 		const lowerCaseFilter = filter.toLowerCase()
 
-		return transactions.filter((transaction) => transaction.category.toLowerCase().includes(lowerCaseFilter))
+		return transactions.filter((transaction) => transaction.category && transaction.category.toLowerCase().includes(lowerCaseFilter))
 	}, [transactions, filter])
 
 	useEffect(() => {
