@@ -1,12 +1,13 @@
 import { TransactionList } from './components/TransactionList'
 import { useTransaction } from './hooks/useTransaction'
 import { Header } from './components/Header'
+import LoadingScreen from './components/LoadingScreen'
 
 export function App() {
 	const { loading } = useTransaction()
 
 	if (loading) {
-		return <div>Carregando transações...</div>
+		return <LoadingScreen />
 	}
 
 	return (
