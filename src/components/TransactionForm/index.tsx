@@ -1,7 +1,7 @@
-import { CurrencyInput } from '@/components/ui/currency-input';
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,47 +11,80 @@ import type { ITransaction } from '@/types/transaction'
 import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
 import { SelectGroup } from '@radix-ui/react-select'
 import { ChevronDownIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
 
-export function TransactionForm() {
+interface TransactionFormProps {
+	open?: boolean
+	onOpenChange?: (open: boolean) => void
+	initialData?: ITransaction | null
+}
+
+export function TransactionForm({ open, onOpenChange, initialData }: TransactionFormProps) {
 	const [amount, setAmount] = useState('')
 	const [description, setDescription] = useState('')
 	const [category, setCategory] = useState('')
 	const [type, setType] = useState<'expense' | 'income'>('income')
 	const [date, setDate] = useState<Date>(new Date())
-	const [isOpen, setIsOpen] = useState(false)
-	const [open, setOpen] = useState(false)
+	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+	const [internalIsOpen, setInternalIsOpen] = useState(false)
 
-	const { setTransactions } = useTransaction()
+	const { setTransactions, updateTransaction } = useTransaction()
+
+	const isControlled = typeof open === 'boolean' && typeof onOpenChange === 'function'
+	const currentOpen = isControlled ? open : internalIsOpen
+	const currentOnOpenChange = isControlled ? onOpenChange : setInternalIsOpen
+
+	useEffect(() => {
+		if (initialData) {
+			setAmount(String(initialData.amount * 100))
+			setDescription(initialData.description)
+			setCategory(initialData.category)
+			setType(initialData.type)
+			setDate(firestoreDateToJSDate(initialData.date))
+		} else {
+			setAmount('')
+			setDescription('')
+			setCategory('')
+			setType('income')
+			setDate(new Date())
+		}
+	}, [initialData])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
 		try {
 			const newAmount = Number(amount.replace(/\D/g, '')) / 100
-			await createTransaction({
-				amount: newAmount,
-				description,
-				category,
-				date,
-				type,
-			})
 
-			setTransactions((prevTransactions: ITransaction[]) => [
-				{
+			if (initialData) {
+				await updateTransaction({
+					...initialData,
 					amount: newAmount,
 					description,
 					category,
 					date,
 					type,
-				},
-				...prevTransactions,
-			])
+				})
+			} else {
+				const createdTransaction = await createTransaction({
+					amount: newAmount,
+					description,
+					category,
+					date,
+					type,
+				})
+
+				setTransactions((prevTransactions: ITransaction[]) => [
+					createdTransaction,
+					...prevTransactions,
+				])
+			}
 		} catch (error) {
-			console.error('Error adding transaction: ', error)
+			console.error(`Error ${initialData ? 'updating' : 'adding'} transaction: `, error)
 			throw error
 		} finally {
-			setIsOpen(false)
+			currentOnOpenChange(false)
 			setAmount('')
 			setDescription('')
 			setCategory('')
@@ -61,13 +94,20 @@ export function TransactionForm() {
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
-				<Button variant="default">Adicionar Tarefa</Button>
-			</DialogTrigger>
+		<Dialog open={currentOpen} onOpenChange={currentOnOpenChange}>
+			{!initialData && (
+				<DialogTrigger asChild>
+					<Button variant="default">Adicionar Tarefa</Button>
+				</DialogTrigger>
+			)}
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
-					<DialogTitle>Criar Nova Tarefa</DialogTitle>
+					<DialogTitle>{initialData ? 'Editar Tarefa' : 'Criar Nova Tarefa'}</DialogTitle>
+					<DialogDescription>
+						{initialData
+							? 'Edite os detalhes da transação aqui.'
+							: 'Preencha os detalhes para adicionar uma nova transação.'}
+					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="grid gap-4 py-4">
 					<div className="grid grid-cols-4 items-center gap-4">
@@ -99,7 +139,7 @@ export function TransactionForm() {
 							Data
 						</Label>
 						<div className="col-span-3">
-							<Popover open={open} onOpenChange={setOpen}>
+							<Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
 								<PopoverTrigger asChild>
 									<Button variant="outline" className="w-48 justify-between font-normal">
 										{date
@@ -119,7 +159,7 @@ export function TransactionForm() {
 										captionLayout="dropdown"
 										onSelect={(date) => {
 											setDate(date)
-											setOpen(false)
+											setIsCalendarOpen(false)
 										}}
 										className="rounded-md border"
 									/>

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from 'react'
-import { getTransactions } from '@/services/transactionService'
+import { deleteTransaction, getTransactions, updateTransaction } from '@/services/transactionService'
 import type { ITransaction } from '@/types/transaction'
 
 interface TransactionContextType {
@@ -8,6 +8,8 @@ interface TransactionContextType {
 	setTransactions: React.Dispatch<React.SetStateAction<ITransaction[]>>
 	setFilter: React.Dispatch<React.SetStateAction<string>>
 	loading: boolean
+	updateTransaction: (transaction: ITransaction) => Promise<void>
+	deleteTransaction: (id: string) => Promise<void>
 }
 
 export const TransactionContext = createContext<TransactionContextType | undefined>(undefined)
@@ -42,6 +44,26 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 		fetchData()
 	}, [])
 
+	const handleUpdateTransaction = async (transaction: ITransaction) => {
+		try {
+			await updateTransaction(transaction)
+			setTransactions((prev) => prev.map((t) => (t.id === transaction.id ? transaction : t)))
+		} catch (error) {
+			console.error('Error updating transaction:', error)
+			throw error
+		}
+	}
+
+	const handleDeleteTransaction = async (id: string) => {
+		try {
+			await deleteTransaction(id)
+			setTransactions((prev) => prev.filter((t) => t.id !== id))
+		} catch (error) {
+			console.error('Error deleting transaction:', error)
+			throw error
+		}
+	}
+
 	return (
 		<TransactionContext.Provider
 			value={{
@@ -50,6 +72,8 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 				setTransactions,
 				setFilter,
 				loading,
+				updateTransaction: handleUpdateTransaction,
+				deleteTransaction: handleDeleteTransaction,
 			}}
 		>
 			{children}

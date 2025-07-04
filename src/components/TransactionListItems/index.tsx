@@ -1,8 +1,11 @@
 import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { Trash2 } from 'lucide-react'
 
 interface TransactionListItemsProps {
 	transactions: ITransaction[]
+	onEdit: (transaction: ITransaction) => void
+	onDelete: (id: string) => void
 }
 
 const formatDate = (date: unknown) => {
@@ -32,7 +35,11 @@ const getCategoryColor = (category: string) => {
 	return colors[index]
 }
 
-export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ transactions }) => {
+export const TransactionListItems: React.FC<TransactionListItemsProps> = ({
+	transactions,
+	onEdit,
+	onDelete,
+}) => {
 	if (transactions.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
@@ -48,7 +55,7 @@ export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ tran
 					key={transaction.id}
 					className="flex flex-col justify-between gap-2 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 sm:flex-row"
 				>
-					<div className="flex-1">
+					<div className="flex-1 cursor-pointer" onClick={() => onEdit(transaction)}>
 						<div className="flex flex-wrap items-baseline gap-2">
 							<strong className="text-gray-900">{transaction.description}</strong>
 							<span className={`rounded-full px-2 py-1 font-medium text-xs ${getCategoryColor(transaction.category)}`}>
@@ -57,12 +64,21 @@ export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ tran
 						</div>
 						<div className="mt-1 text-gray-500 text-sm">{formatDate(transaction.date)}</div>
 					</div>
-					<div
-						className={`font-bold text-lg sm:text-base ${
-							transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-						}`}
-					>
-						{formatAmount(transaction.amount, transaction.type)}
+					<div className="flex items-center gap-2">
+						<div
+							className={`font-bold text-lg sm:text-base ${
+								transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+							}`}
+						>
+							{formatAmount(transaction.amount, transaction.type)}
+						</div>
+						<button
+							onClick={() => onDelete(transaction.id as string)}
+							className="text-gray-400 hover:text-red-600 focus:outline-none"
+							title="Deletar transação"
+						>
+							<Trash2 size={18} />
+						</button>
 					</div>
 				</li>
 			))}
