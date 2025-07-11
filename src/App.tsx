@@ -1,7 +1,7 @@
-import { TransactionList } from './components/TransactionList'
-import { useTransaction } from './hooks/useTransaction'
 import { Header } from './components/Header'
 import LoadingScreen from './components/LoadingScreen'
+import { TransactionList } from './components/TransactionList'
+import { useTransaction } from './hooks/useTransaction'
 
 export function App() {
 	const { loading } = useTransaction()
@@ -13,7 +13,7 @@ export function App() {
 	return (
 		<>
 			<Header />
-			<div className="mx-auto p-5">
+			<div className="mx-auto sm:p-5">
 				<TransactionList />
 			</div>
 		</>

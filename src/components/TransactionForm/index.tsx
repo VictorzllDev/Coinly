@@ -1,6 +1,9 @@
-import { CurrencyInput } from '@/components/ui/currency-input'
+import { ChevronDownIcon } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { CategorySelect } from '@/components/CategorySelect'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import {
 	Dialog,
 	DialogContent,
@@ -11,99 +14,77 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useTransaction } from '@/hooks/useTransaction'
-import { createTransaction } from '@/services/transactionService'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { ITransaction } from '@/types/transaction'
-import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
-import { SelectGroup } from '@radix-ui/react-select'
-import { ChevronDownIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 interface TransactionFormProps {
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 	initialData?: ITransaction | null
+	onSubmit: (data: ITransaction) => Promise<void>
+	children?: string
 }
 
-export function TransactionForm({ open, onOpenChange, initialData }: TransactionFormProps) {
-	const [amount, setAmount] = useState('')
-	const [description, setDescription] = useState('')
-	const [category, setCategory] = useState('')
-	const [type, setType] = useState<'expense' | 'income'>('income')
-	const [date, setDate] = useState<Date>(new Date())
+export function TransactionForm({ open, onOpenChange, initialData, onSubmit, children }: TransactionFormProps) {
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 	const [internalIsOpen, setInternalIsOpen] = useState(false)
 
-	const { setTransactions, updateTransaction } = useTransaction()
+	const [inputs, setInputs] = useState<ITransaction>({
+		amount: 0,
+		description: '',
+		category: '',
+		type: 'income',
+		date: new Date(),
+	})
+
+	const { amount, description, category, type, date } = inputs
 
 	const isControlled = typeof open === 'boolean' && typeof onOpenChange === 'function'
 	const currentOpen = isControlled ? open : internalIsOpen
 	const currentOnOpenChange = isControlled ? onOpenChange : setInternalIsOpen
 
+	const clearForm = useCallback(() => {
+		setInputs({
+			amount: 0,
+			description: '',
+			category: '',
+			type: 'income',
+			date: new Date(),
+		})
+	}, [])
+
 	useEffect(() => {
 		if (initialData) {
-			setAmount(String(initialData.amount))
-			setDescription(initialData.description)
-			setCategory(initialData.category)
-			setType(initialData.type)
-			setDate(firestoreDateToJSDate(initialData.date))
+			setInputs(initialData)
 		} else {
-			setAmount('')
-			setDescription('')
-			setCategory('')
-			setType('income')
-			setDate(new Date())
+			clearForm()
 		}
-	}, [initialData])
+	}, [initialData, clearForm])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
 		try {
-			const parseAmount = (value: string) => Number(value.replace(/\D/g, '')) / 100
-
-			const newAmount = parseAmount(amount)
-
-			if (initialData) {
-				await updateTransaction({
-					...initialData,
-					amount: newAmount,
-					description,
-					category,
-					date,
-					type,
-				})
-			} else {
-				const createdTransaction = await createTransaction({
-					amount: newAmount,
-					description,
-					category,
-					date,
-					type,
-				})
-
-				setTransactions((prevTransactions: ITransaction[]) => [createdTransaction, ...prevTransactions])
-			}
+			await onSubmit(inputs)
 		} catch (error) {
-			console.error(`Error ${initialData ? 'updating' : 'adding'} transaction: `, error)
+			console.error(`Error ${inputs} transaction: `, error)
 			throw error
 		} finally {
 			currentOnOpenChange(false)
-			setAmount('')
-			setDescription('')
-			setCategory('')
-			setDate(new Date())
-			setType('income')
+			clearForm()
 		}
+	}
+
+	const handleInputChange = <T extends keyof ITransaction>(field: T, value: ITransaction[T]) => {
+		setInputs((prev) => ({ ...prev, [field]: value }))
 	}
 
 	return (
 		<Dialog open={currentOpen} onOpenChange={currentOnOpenChange}>
 			{!initialData && (
 				<DialogTrigger asChild>
-					<Button variant="default">Adicionar Tarefa</Button>
+					<Button variant="default">{children}</Button>
 				</DialogTrigger>
 			)}
 			<DialogContent className="sm:max-w-[425px]">
@@ -122,7 +103,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 						</Label>
 						<CurrencyInput
 							value={amount}
-							onValueChange={(values) => setAmount(values.value)}
+							onValueChange={(values) => handleInputChange('amount', Number(values.value) ?? 0)}
 							className="col-span-3"
 							required
 						/>
@@ -134,7 +115,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 						</Label>
 						<Input
 							value={description}
-							onChange={(e) => setDescription(e.target.value)}
+							onChange={(e) => handleInputChange('description', e.target.value)}
 							className="col-span-3"
 							required
 						/>
@@ -149,7 +130,7 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 								<PopoverTrigger asChild>
 									<Button variant="outline" className="w-48 justify-between font-normal">
 										{date
-											? date.toLocaleDateString('pt-BR', {
+											? new Date(date).toLocaleDateString('pt-BR', {
 													day: '2-digit',
 													month: 'long',
 													year: 'numeric',
@@ -161,11 +142,11 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 								<PopoverContent className="w-auto overflow-hidden p-0" align="start">
 									<Calendar
 										mode="single"
-										selected={date}
+										selected={new Date(date)}
 										captionLayout="dropdown"
-										onSelect={(date) => {
-											if (date) {
-												setDate(date)
+										onSelect={(selectedDate) => {
+											if (selectedDate) {
+												handleInputChange('date', selectedDate)
 												setIsCalendarOpen(false)
 											}
 										}}
@@ -176,33 +157,25 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 						</div>
 					</div>
 
-					<div className="grid grid-cols-4 items-center gap-4">
-						<Label htmlFor="category" className="text-right">
-							Cartegoria
-						</Label>
-						<Input
-							value={category}
-							onChange={(e) => setCategory(e.target.value.replaceAll(/\s/g, ''))}
-							className="col-span-3"
-							required
-						/>
-					</div>
+					<CategorySelect value={category} onChange={(value) => handleInputChange('category', value)} />
 
 					<div className="grid grid-cols-4 items-center gap-4">
 						<Label htmlFor="category" className="text-right">
 							Transação
 						</Label>
-						<Select defaultValue="income" onValueChange={(e) => setType(e as 'expense' | 'income')} value={type}>
-							<SelectTrigger className="w-[180px]">
-								<SelectValue placeholder="Transação" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectGroup>
-									<SelectItem value="income">Entrada</SelectItem>
-									<SelectItem value="expense">Saída</SelectItem>
-								</SelectGroup>
-							</SelectContent>
-						</Select>
+						<div className="col-span-3">
+							<Select onValueChange={(value) => handleInputChange('type', value as 'expense' | 'income')} value={type}>
+								<SelectTrigger className="w-[180px]">
+									<SelectValue placeholder="Transação" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="income">Entrada</SelectItem>
+										<SelectItem value="expense">Saída</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
 
 					<div className="flex justify-end">
@@ -213,3 +186,4 @@ export function TransactionForm({ open, onOpenChange, initialData }: Transaction
 		</Dialog>
 	)
 }
+

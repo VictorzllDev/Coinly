@@ -1,13 +1,21 @@
-import { createContext, useEffect, useMemo, useState } from 'react'
-import { deleteTransaction, getTransactions, updateTransaction } from '@/services/transactionService'
+import { createContext, useEffect, useState } from 'react'
+import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from '@/services/transactionService'
 import type { ITransaction } from '@/types/transaction'
+
+interface IFilters {
+	selectedCategory: string | null
+	minAmount: string
+	maxAmount: string
+	transactionType: 'all' | 'income' | 'expense'
+}
 
 interface TransactionContextType {
 	transactions: ITransaction[]
-	filteredTransactions: ITransaction[]
 	setTransactions: React.Dispatch<React.SetStateAction<ITransaction[]>>
-	setFilter: React.Dispatch<React.SetStateAction<string>>
+	filters: IFilters
+	setFilters: React.Dispatch<React.SetStateAction<IFilters>>
 	loading: boolean
+	createTransaction: (transaction: ITransaction) => Promise<void>
 	updateTransaction: (transaction: ITransaction) => Promise<void>
 	deleteTransaction: (id: string) => Promise<void>
 }
@@ -17,16 +25,12 @@ export const TransactionContext = createContext<TransactionContextType | undefin
 export const TransactionProvider = ({ children }: { children: React.ReactNode }) => {
 	const [transactions, setTransactions] = useState<ITransaction[]>([])
 	const [loading, setLoading] = useState(true)
-	const [filter, setFilter] = useState('alimento')
-
-	// Filter transactions based on the filter string
-	const filteredTransactions = useMemo(() => {
-		if (!filter) return transactions
-
-		const lowerCaseFilter = filter.toLowerCase()
-
-		return transactions.filter((transaction) => transaction.category && transaction.category.toLowerCase().includes(lowerCaseFilter))
-	}, [transactions, filter])
+	const [filters, setFilters] = useState<IFilters>({
+		selectedCategory: null,
+		minAmount: '',
+		maxAmount: '',
+		transactionType: 'all',
+	})
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -43,6 +47,16 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
 		fetchData()
 	}, [])
+
+	const handlerCreateTransaction = async (transaction: ITransaction) => {
+		try {
+			await createTransaction(transaction)
+			setTransactions((prev) => [...prev, transaction])
+		} catch (error) {
+			console.error('Error creating transaction:', error)
+			throw error
+		}
+	}
 
 	const handleUpdateTransaction = async (transaction: ITransaction) => {
 		try {
@@ -68,10 +82,11 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 		<TransactionContext.Provider
 			value={{
 				transactions,
-				filteredTransactions,
 				setTransactions,
-				setFilter,
+				filters,
+				setFilters,
 				loading,
+				createTransaction: handlerCreateTransaction,
 				updateTransaction: handleUpdateTransaction,
 				deleteTransaction: handleDeleteTransaction,
 			}}

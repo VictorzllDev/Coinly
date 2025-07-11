@@ -35,7 +35,7 @@ const getCategoryColor = (category: string) => {
 	return colors[index]
 }
 
-export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ transactions, onEdit, onDelete }) => {
+export function TransactionListItems({ transactions, onEdit, onDelete }: TransactionListItemsProps) {
 	if (transactions.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
@@ -70,7 +70,8 @@ export const TransactionListItems: React.FC<TransactionListItemsProps> = ({ tran
 						</div>
 						<button
 							onClick={() => onDelete(transaction.id as string)}
-							className="text-gray-400 hover:text-red-600 focus:outline-none"
+							type="button"
+							className="cursor-pointer text-gray-400 hover:text-red-600 focus:outline-none"
 							title="Deletar transação"
 						>
 							<Trash2 size={18} />
