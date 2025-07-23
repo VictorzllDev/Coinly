@@ -1,6 +1,6 @@
+import { Trash2 } from 'lucide-react'
 import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
-import { Trash2 } from 'lucide-react'
 
 interface TransactionListItemsProps {
 	transactions: ITransaction[]

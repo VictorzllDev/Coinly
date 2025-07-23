@@ -3,7 +3,6 @@ import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useTransaction } from '@/hooks/useTransaction'
-import { TransactionForm } from '../TransactionForm'
 
 function getCategoryColor(category: string) {
 	const colors = [

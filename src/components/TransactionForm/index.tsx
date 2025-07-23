@@ -186,4 +186,3 @@ export function TransactionForm({ open, onOpenChange, initialData, onSubmit, chi
 		</Dialog>
 	)
 }
-
