@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { useState } from 'react'
 
 // Definindo o schema de validação com Zod
 const transactionFormSchema = z.object({
@@ -45,6 +46,9 @@ const transactionFormSchema = z.object({
 type TransactionFormInputs = z.infer<typeof transactionFormSchema>
 
 export function TransactionForm() {
+	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+
 	const {
 		register,
 		handleSubmit,
@@ -56,6 +60,7 @@ export function TransactionForm() {
 		defaultValues: {
 			amount: 0,
 			description: '',
+			date: new Date(),
 			time: format(new Date(), 'HH:mm'),
 			category: '',
 			type: '',
@@ -64,12 +69,13 @@ export function TransactionForm() {
 
 	const onSubmit = (data: TransactionFormInputs) => {
 		console.log('Dados do formulário:', data)
-		// Aqui você pode adicionar a lógica para enviar os dados para sua API
+
+		setIsModalOpen(false)
 		reset()
 	}
 
 	return (
-		<Dialog>
+		<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 			<DialogTrigger asChild>
 				<Button variant="default">Nova Transação</Button>
 			</DialogTrigger>
@@ -99,7 +105,7 @@ export function TransactionForm() {
 									/>
 								)}
 							/>
-							{errors.amount && <p className="mt-1 text-sm text-red-500">{errors.amount.message}</p>}
+							{errors.amount && <p className="mt-1 text-red-500 text-sm">{errors.amount.message}</p>}
 						</div>
 					</div>
 
@@ -109,7 +115,7 @@ export function TransactionForm() {
 						</Label>
 						<div className="col-span-3">
 							<Input id="description" className="w-full" {...register('description')} />
-							{errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
+							{errors.description && <p className="mt-1 text-red-500 text-sm">{errors.description.message}</p>}
 						</div>
 					</div>
 
@@ -122,7 +128,7 @@ export function TransactionForm() {
 								name="date"
 								control={control}
 								render={({ field }) => (
-									<Popover>
+									<Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
 										<PopoverTrigger asChild>
 											<Button id="date" variant="outline" className="w-full justify-between font-normal">
 												{field.value ? format(field.value, 'PPP', { locale: ptBR }) : 'Selecionar data'}
@@ -133,7 +139,10 @@ export function TransactionForm() {
 											<Calendar
 												mode="single"
 												selected={field.value}
-												onSelect={field.onChange}
+												onSelect={(date) => {
+													field.onChange(date)
+													setIsCalendarOpen(false)
+												}}
 												captionLayout="dropdown"
 												className="rounded-md border"
 												locale={ptBR}
@@ -142,7 +151,7 @@ export function TransactionForm() {
 									</Popover>
 								)}
 							/>
-							{errors.date && <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>}
+							{errors.date && <p className="mt-1 text-red-500 text-sm">{errors.date.message}</p>}
 						</div>
 					</div>
 
@@ -155,10 +164,10 @@ export function TransactionForm() {
 								type="time"
 								id="time-picker"
 								step="1"
-								className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+								className="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
 								{...register('time')}
 							/>
-							{errors.time && <p className="mt-1 text-sm text-red-500">{errors.time.message}</p>}
+							{errors.time && <p className="mt-1 text-red-500 text-sm">{errors.time.message}</p>}
 						</div>
 					</div>
 
@@ -191,7 +200,7 @@ export function TransactionForm() {
 									</Select>
 								)}
 							/>
-							{errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
+							{errors.category && <p className="mt-1 text-red-500 text-sm">{errors.category.message}</p>}
 						</div>
 					</div>
 
@@ -217,13 +226,13 @@ export function TransactionForm() {
 									</Select>
 								)}
 							/>
-							{errors.type && <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>}
+							{errors.type && <p className="mt-1 text-red-500 text-sm">{errors.type.message}</p>}
 						</div>
 					</div>
 
 					<DialogFooter>
 						<DialogClose asChild>
-							<Button variant="outline" type="button">
+							<Button variant="outline" type="button" onClick={() => reset()}>
 								Cancelar
 							</Button>
 						</DialogClose>
