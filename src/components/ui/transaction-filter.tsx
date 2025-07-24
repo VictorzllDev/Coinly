@@ -1,32 +1,23 @@
 import { useMemo } from 'react'
+import { getCategoryColor } from '@/components/ui/category-badge'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useTransaction } from '@/hooks/useTransaction'
+import { useFilter } from '@/hooks/useFilter'
+import type { ITransaction } from '@/types/transaction'
 
-function getCategoryColor(category: string) {
-	const colors = [
-		'bg-blue-100 text-blue-800',
-		'bg-green-100 text-green-800',
-		'bg-yellow-100 text-yellow-800',
-		'bg-purple-100 text-purple-800',
-		'bg-pink-100 text-pink-800',
-		'bg-indigo-100 text-indigo-800',
-		'bg-red-100 text-red-800',
-		'bg-teal-100 text-teal-800',
-	]
-	const index = Math.abs((category || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % colors.length
-	return colors[index]
+export interface ITransactionFilterProps {
+	transactions: ITransaction[]
 }
 
-export function TransactionFilter() {
-	const { transactions, filters, setFilters } = useTransaction()
+export function TransactionFilter({ transactions }: ITransactionFilterProps) {
+	const { filters, setFilters } = useFilter()
 	const { selectedCategory, transactionType, minAmount, maxAmount } = filters
 
 	const categories = useMemo(() => {
 		const uniqueCategories = new Set<string>()
 		transactions.forEach((transaction) => {
-			uniqueCategories.add(transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1))
+			uniqueCategories.add(transaction.category)
 		})
 		return Array.from(uniqueCategories).sort()
 	}, [transactions])
@@ -34,11 +25,13 @@ export function TransactionFilter() {
 	return (
 		<div className="mb-6 space-y-4">
 			<div>
-				<Label className="mb-2 block font-medium text-gray-700 text-sm">Categoria</Label>
+				<Label className="mb-2 block font-medium text-gray-700 text-sm">Categorias</Label>
 				<div className="flex flex-wrap gap-2">
 					<button
 						type="button"
-						onClick={() => setFilters({ ...filters, selectedCategory: null })}
+						onClick={() => {
+							setFilters({ ...filters, selectedCategory: null })
+						}}
 						className={`rounded-full px-3 py-1.5 font-medium text-sm transition-colors ${
 							selectedCategory === null ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
 						}`}
@@ -64,7 +57,7 @@ export function TransactionFilter() {
 
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<div>
-					<Label className="mb-2 block font-medium text-gray-700 text-sm">Tipo</Label>
+					<Label className="mb-2 block font-medium text-gray-700 text-sm">Transação</Label>
 					<Select
 						value={transactionType}
 						onValueChange={(value) =>
@@ -83,20 +76,20 @@ export function TransactionFilter() {
 				</div>
 
 				<div>
-					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Mínimo (R$)</Label>
+					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Mínimo</Label>
 					<CurrencyInput
 						value={minAmount}
-						onValueChange={(values) => setFilters({ ...filters, minAmount: values.value })}
-						placeholder="0,00"
+						onValueChange={({ value }) => setFilters({ ...filters, minAmount: Number(value) })}
+						placeholder="R$ 0,00"
 					/>
 				</div>
 
 				<div>
-					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Máximo (R$)</Label>
+					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Máximo</Label>
 					<CurrencyInput
 						value={maxAmount}
-						onValueChange={(values) => setFilters({ ...filters, maxAmount: values.value })}
-						placeholder="0,00"
+						onValueChange={({ value }) => setFilters({ ...filters, maxAmount: Number(value) })}
+						placeholder="R$ 0,00"
 					/>
 				</div>
 			</div>

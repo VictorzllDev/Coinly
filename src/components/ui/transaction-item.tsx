@@ -12,7 +12,7 @@ export function TransactionItem({ transaction }: TransactionListItemsProps) {
 	return (
 		<li
 			key={transaction.id}
-			className="flex flex-row justify-between gap-2 overflow-hidden rounded-lg border border-gray-200 transition-colors hover:bg-gray-50"
+			className="flex flex-row justify-between gap-2 overflow-hidden rounded-lg border border-gray-200 transition-colors active:bg-gray-100 hover:bg-gray-100"
 		>
 			<button
 				type="button"
@@ -42,7 +42,7 @@ export function TransactionItem({ transaction }: TransactionListItemsProps) {
 						console.log('Deletar item nao feita')
 					}}
 					type="button"
-					className="flex h-full w-14 cursor-pointer items-center justify-center bg-red-500 text-white focus:outline-none"
+					className="flex h-full w-14 cursor-pointer items-center justify-center bg-red-500 text-white focus:outline-none active:bg-red-600 hover:bg-red-600"
 					title="Deletar transação"
 				>
 					<Trash2 size={18} />

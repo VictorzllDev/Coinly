@@ -6,7 +6,5 @@ export function App() {
 	// 	return <LoadingScreen />
 	// }
 
-	return (
-		<Home />
-	)
+	return <Home />
 }
