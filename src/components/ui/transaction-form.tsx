@@ -1,4 +1,9 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { ChevronDownIcon } from 'lucide-react'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { CurrencyInput } from '@/components/ui/currency-input'
@@ -17,30 +22,95 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
+// Definindo o schema de validação com Zod
+const transactionFormSchema = z.object({
+	amount: z.number().min(0.01, 'O valor deve ser maior que zero'),
+	description: z.string().min(3, 'Minimo 3 caracteres'),
+	date: z.date({
+		message: 'Selecione uma data',
+	}),
+	time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Formato de hora inválido'),
+	category: z.string().min(1, 'Selecione uma categoria'),
+	type: z
+		.union([
+			z.literal('income'),
+			z.literal('expense'),
+			z.literal(''), // Permite string vazia inicial
+		])
+		.refine((val) => val === 'income' || val === 'expense', {
+			message: 'Selecione um tipo de transação',
+		}),
+})
+
+type TransactionFormInputs = z.infer<typeof transactionFormSchema>
+
 export function TransactionForm() {
+	const {
+		register,
+		handleSubmit,
+		control,
+		formState: { errors },
+		reset,
+	} = useForm<TransactionFormInputs>({
+		resolver: zodResolver(transactionFormSchema),
+		defaultValues: {
+			amount: 0,
+			description: '',
+			time: format(new Date(), 'HH:mm'),
+			category: '',
+			type: '',
+		},
+	})
+
+	const onSubmit = (data: TransactionFormInputs) => {
+		console.log('Dados do formulário:', data)
+		// Aqui você pode adicionar a lógica para enviar os dados para sua API
+		reset()
+	}
+
 	return (
 		<Dialog>
-			<form id="transaction-form" className="grid gap-4 py-4">
-				<DialogTrigger asChild>
-					<Button variant="default">Nova Transação</Button>
-				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>Criar Nova Transação</DialogTitle>
-						<DialogDescription>Preencha os detalhes para adicionar uma nova transação.</DialogDescription>
-					</DialogHeader>
+			<DialogTrigger asChild>
+				<Button variant="default">Nova Transação</Button>
+			</DialogTrigger>
+
+			<DialogContent className="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>Criar Nova Transação</DialogTitle>
+					<DialogDescription>Preencha os detalhes para adicionar uma nova transação.</DialogDescription>
+				</DialogHeader>
+
+				<form id="transaction-form" className="grid gap-4 py-4" onSubmit={handleSubmit(onSubmit)}>
 					<div className="grid grid-cols-4 items-center gap-4">
 						<Label htmlFor="amount" className="text-right">
 							Valor
 						</Label>
-						<CurrencyInput id="amount" className="col-span-3" placeholder="R$ 0,00" required />
+						<div className="col-span-3">
+							<Controller
+								name="amount"
+								control={control}
+								render={({ field }) => (
+									<CurrencyInput
+										id="amount"
+										value={field.value}
+										onValueChange={({ value }) => field.onChange(Number(value))}
+										className="w-full"
+										placeholder="R$ 0,00"
+									/>
+								)}
+							/>
+							{errors.amount && <p className="mt-1 text-sm text-red-500">{errors.amount.message}</p>}
+						</div>
 					</div>
 
 					<div className="grid grid-cols-4 items-center gap-4">
 						<Label htmlFor="description" className="text-right">
 							Descrição
 						</Label>
-						<Input id="description" className="col-span-3" required />
+						<div className="col-span-3">
+							<Input id="description" className="w-full" {...register('description')} />
+							{errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
+						</div>
 					</div>
 
 					<div className="grid grid-cols-4 items-center gap-4">
@@ -48,23 +118,37 @@ export function TransactionForm() {
 							Data
 						</Label>
 						<div className="col-span-3">
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button id="date" variant="outline" className="w-full justify-between font-normal">
-										Selecionar data
-										<ChevronDownIcon />
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto overflow-hidden p-0" align="start">
-									<Calendar mode="single" captionLayout="dropdown" className="rounded-md border" />
-								</PopoverContent>
-							</Popover>
+							<Controller
+								name="date"
+								control={control}
+								render={({ field }) => (
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button id="date" variant="outline" className="w-full justify-between font-normal">
+												{field.value ? format(field.value, 'PPP', { locale: ptBR }) : 'Selecionar data'}
+												<ChevronDownIcon />
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												captionLayout="dropdown"
+												className="rounded-md border"
+												locale={ptBR}
+											/>
+										</PopoverContent>
+									</Popover>
+								)}
+							/>
+							{errors.date && <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>}
 						</div>
 					</div>
 
 					<div className="grid grid-cols-4 items-center gap-4">
 						<Label htmlFor="time" className="text-right">
-							Time
+							Hora
 						</Label>
 						<div className="col-span-3">
 							<Input
@@ -72,7 +156,9 @@ export function TransactionForm() {
 								id="time-picker"
 								step="1"
 								className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+								{...register('time')}
 							/>
+							{errors.time && <p className="mt-1 text-sm text-red-500">{errors.time.message}</p>}
 						</div>
 					</div>
 
@@ -81,24 +167,31 @@ export function TransactionForm() {
 							Categoria
 						</Label>
 						<div className="col-span-3">
-							<Select>
-								<SelectTrigger id="category" className="w-full">
-									<SelectValue placeholder="Categoria" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectGroup>
-										<SelectItem value="Salário">Salário</SelectItem>
-										<SelectItem value="Alimentação">Alimentação</SelectItem>
-										<SelectItem value="Transporte">Transporte</SelectItem>
-										<SelectItem value="Moradia">Moradia</SelectItem>
-										<SelectItem value="Saúde">Saúde</SelectItem>
-										<SelectItem value="Educação">Educação</SelectItem>
-										<SelectItem value="Lazer">Lazer</SelectItem>
-										<SelectItem value="Investimentos">Investimentos</SelectItem>
-										<SelectItem value="Outro">Outro</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
+							<Controller
+								name="category"
+								control={control}
+								render={({ field }) => (
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger id="category" className="w-full">
+											<SelectValue placeholder="Categoria" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value="Salário">Salário</SelectItem>
+												<SelectItem value="Alimentação">Alimentação</SelectItem>
+												<SelectItem value="Transporte">Transporte</SelectItem>
+												<SelectItem value="Moradia">Moradia</SelectItem>
+												<SelectItem value="Saúde">Saúde</SelectItem>
+												<SelectItem value="Educação">Educação</SelectItem>
+												<SelectItem value="Lazer">Lazer</SelectItem>
+												<SelectItem value="Investimentos">Investimentos</SelectItem>
+												<SelectItem value="Outro">Outro</SelectItem>
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+								)}
+							/>
+							{errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
 						</div>
 					</div>
 
@@ -107,23 +200,30 @@ export function TransactionForm() {
 							Transação
 						</Label>
 						<div className="col-span-3">
-							<Select>
-								<SelectTrigger id="type" className="w-full">
-									<SelectValue placeholder="Transação" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectGroup>
-										<SelectItem value="income">Entrada</SelectItem>
-										<SelectItem value="expense">Saída</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
+							<Controller
+								name="type"
+								control={control}
+								render={({ field }) => (
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger id="type" className="w-full">
+											<SelectValue placeholder="Transação" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value="income">Entrada</SelectItem>
+												<SelectItem value="expense">Saída</SelectItem>
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+								)}
+							/>
+							{errors.type && <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>}
 						</div>
 					</div>
 
 					<DialogFooter>
 						<DialogClose asChild>
-							<Button variant="outline" type="submit">
+							<Button variant="outline" type="button">
 								Cancelar
 							</Button>
 						</DialogClose>
@@ -131,8 +231,8 @@ export function TransactionForm() {
 							Criar
 						</Button>
 					</DialogFooter>
-				</DialogContent>
-			</form>
+				</form>
+			</DialogContent>
 		</Dialog>
 	)
 }
