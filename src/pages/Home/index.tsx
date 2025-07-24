@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
 import { Header } from '@/components/ui/header'
+import { Separator } from '@/components/ui/separator'
 import { TransactionFilter } from '@/components/ui/transaction-filter'
 import { TransactionForm } from '@/components/ui/transaction-form'
 import { TransactionList } from '@/components/ui/transaction-list'
@@ -12,7 +12,7 @@ const transactions: ITransaction[] = [
 		description: 'Aluguel',
 		category: 'Casa',
 		amount: 300,
-		date: new Date(),
+		date: new Date('10-05-2024'),
 		type: 'expense',
 	},
 	{
@@ -62,11 +62,9 @@ export function Home() {
 				<div className="space-y-3">
 					<TransactionFilter transactions={transactions} />
 
-					<TransactionForm />
+					<Separator className="my-4" />
 
-					<div className="flex justify-end">
-						<span className="text-gray-500 text-sm">12 Transação</span>
-					</div>
+					<TransactionForm />
 
 					<TransactionList transactions={transactions} />
 				</div>

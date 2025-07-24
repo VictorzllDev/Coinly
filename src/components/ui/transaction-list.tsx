@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
+import { Separator } from '@/components/ui/separator'
 import { useFilter } from '@/hooks/useFilter'
 import type { ITransaction } from '@/types/transaction'
-import { TransactionItem } from './transaction-item'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { TransactionItem } from './transaction-item'
 
 export interface ITransactionListProps {
 	transactions: ITransaction[]
@@ -52,6 +53,13 @@ export function TransactionList({ transactions }: ITransactionListProps) {
 
 	return (
 		<ul className="space-y-3">
+			<div className="flex items-center justify-end">
+				<span className="w-full pl-4">
+					<Separator />
+				</span>
+				<span className="text-nowrap px-4 text-gray-500 text-sm">{sortedTransactions.length} Transações</span>
+			</div>
+
 			{sortedTransactions.map((transaction) => (
 				<TransactionItem key={transaction.id} transaction={transaction} />
 			))}

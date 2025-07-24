@@ -5,13 +5,14 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFilter } from '@/hooks/useFilter'
 import type { ITransaction } from '@/types/transaction'
+import { Button } from './button'
 
 export interface ITransactionFilterProps {
 	transactions: ITransaction[]
 }
 
 export function TransactionFilter({ transactions }: ITransactionFilterProps) {
-	const { filters, setFilters } = useFilter()
+	const { filters, setFilters, resetFilters } = useFilter()
 	const { selectedCategory, transactionType, minAmount, maxAmount } = filters
 
 	const categories = useMemo(() => {
@@ -23,7 +24,7 @@ export function TransactionFilter({ transactions }: ITransactionFilterProps) {
 	}, [transactions])
 
 	return (
-		<div className="mb-6 space-y-4">
+		<div className="space-y-4">
 			<div>
 				<Label className="mb-2 block font-medium text-gray-700 text-sm">Categorias</Label>
 				<div className="flex flex-wrap gap-2">
@@ -79,7 +80,7 @@ export function TransactionFilter({ transactions }: ITransactionFilterProps) {
 					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Mínimo</Label>
 					<CurrencyInput
 						value={minAmount}
-						onValueChange={({ value }) => setFilters({ ...filters, minAmount: Number(value) })}
+						onValueChange={({ value }) => setFilters({ ...filters, minAmount: Number(value) || '' })}
 						placeholder="R$ 0,00"
 					/>
 				</div>
@@ -88,11 +89,14 @@ export function TransactionFilter({ transactions }: ITransactionFilterProps) {
 					<Label className="mb-2 block font-medium text-gray-700 text-sm">Valor Máximo</Label>
 					<CurrencyInput
 						value={maxAmount}
-						onValueChange={({ value }) => setFilters({ ...filters, maxAmount: Number(value) })}
+						onValueChange={({ value }) => setFilters({ ...filters, maxAmount: Number(value) || '' })}
 						placeholder="R$ 0,00"
 					/>
 				</div>
 			</div>
+			<Button type="button" variant="destructive" onClick={resetFilters} className="w-full">
+				Limpar Filtros
+			</Button>
 		</div>
 	)
 }

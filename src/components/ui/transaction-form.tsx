@@ -25,7 +25,7 @@ import { useState } from 'react'
 
 // Definindo o schema de validação com Zod
 const transactionFormSchema = z.object({
-	amount: z.number().min(0.01, 'O valor deve ser maior que zero'),
+	amount: z.union([z.number().min(0.01, 'Valor deve ser maior que 0'), z.string().min(1, 'Digite um valor')]),
 	description: z.string().min(3, 'Minimo 3 caracteres'),
 	date: z.date({
 		message: 'Selecione uma data',
@@ -58,7 +58,7 @@ export function TransactionForm() {
 	} = useForm<TransactionFormInputs>({
 		resolver: zodResolver(transactionFormSchema),
 		defaultValues: {
-			amount: 0,
+			amount: '',
 			description: '',
 			date: new Date(),
 			time: format(new Date(), 'HH:mm'),
@@ -77,7 +77,9 @@ export function TransactionForm() {
 	return (
 		<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 			<DialogTrigger asChild>
-				<Button variant="default">Nova Transação</Button>
+				<Button variant="default" className="w-full">
+					Nova Transação
+				</Button>
 			</DialogTrigger>
 
 			<DialogContent className="sm:max-w-[425px]">
