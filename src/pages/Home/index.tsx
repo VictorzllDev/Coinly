@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/ui/header'
 import { TransactionFilter } from '@/components/ui/transaction-filter'
+import { TransactionForm } from '@/components/ui/transaction-form'
 import { TransactionList } from '@/components/ui/transaction-list'
 import { FilterProvider } from '@/contexts/filterContext'
 import type { ITransaction } from '@/types/transaction'
@@ -61,11 +62,7 @@ export function Home() {
 				<div className="space-y-3">
 					<TransactionFilter transactions={transactions} />
 
-					<div className="flex justify-start">
-						<Button type="button" variant="default">
-							nova transação
-						</Button>
-					</div>
+					<TransactionForm />
 
 					<div className="flex justify-end">
 						<span className="text-gray-500 text-sm">12 Transação</span>
