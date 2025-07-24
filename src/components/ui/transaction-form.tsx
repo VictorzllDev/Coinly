@@ -50,7 +50,7 @@ export function TransactionForm() {
 						<div className="col-span-3">
 							<Popover>
 								<PopoverTrigger asChild>
-									<Button id="date" variant="outline" className="w-48 justify-between font-normal">
+									<Button id="date" variant="outline" className="w-full justify-between font-normal">
 										Selecionar data
 										<ChevronDownIcon />
 									</Button>
@@ -63,12 +63,26 @@ export function TransactionForm() {
 					</div>
 
 					<div className="grid grid-cols-4 items-center gap-4">
+						<Label htmlFor="time" className="text-right">
+							Time
+						</Label>
+						<div className="col-span-3">
+							<Input
+								type="time"
+								id="time-picker"
+								step="1"
+								className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+							/>
+						</div>
+					</div>
+
+					<div className="grid grid-cols-4 items-center gap-4">
 						<Label htmlFor="category" className="text-right">
 							Categoria
 						</Label>
 						<div className="col-span-3">
 							<Select>
-								<SelectTrigger id="category" className="w-[180px]">
+								<SelectTrigger id="category" className="w-full">
 									<SelectValue placeholder="Categoria" />
 								</SelectTrigger>
 								<SelectContent>
@@ -94,7 +108,7 @@ export function TransactionForm() {
 						</Label>
 						<div className="col-span-3">
 							<Select>
-								<SelectTrigger id="type" className="w-[180px]">
+								<SelectTrigger id="type" className="w-full">
 									<SelectValue placeholder="Transação" />
 								</SelectTrigger>
 								<SelectContent>
