@@ -19,6 +19,8 @@
 		"@radix-ui/react-separator": "^1.1.7",
 		"@radix-ui/react-slot": "^1.2.3",
 		"@tailwindcss/vite": "^4.1.11",
+		"@tanstack/react-router": "^1.129.8",
+		"@tanstack/react-router-devtools": "^1.129.8",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.1.0",
@@ -35,6 +37,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.6",
+		"@tanstack/router-plugin": "^1.129.8",
 		"@types/node": "^24.0.10",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
