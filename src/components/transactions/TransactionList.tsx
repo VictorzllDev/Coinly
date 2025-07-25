@@ -3,7 +3,7 @@ import { Separator } from '@/components/ui/separator'
 import { useFilter } from '@/hooks/useFilter'
 import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
-import { TransactionItem } from './transaction-item'
+import { TransactionItem } from './TransactionItem'
 
 export interface ITransactionListProps {
 	transactions: ITransaction[]
@@ -43,7 +43,7 @@ export function TransactionList({ transactions }: ITransactionListProps) {
 		})
 	}, [filteredTransactions])
 
-	if (transactions.length === 0) {
+	if (sortedTransactions.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
 				Nenhuma transação encontrada

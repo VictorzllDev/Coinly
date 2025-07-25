@@ -1,30 +1,21 @@
-import { useMemo } from 'react'
+import { Button } from '@/components/ui/button'
 import { getCategoryColor } from '@/components/ui/category-badge'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFilter } from '@/hooks/useFilter'
-import type { ITransaction } from '@/types/transaction'
-import { Button } from './button'
+import { DialogClose, DialogFooter } from '../ui/dialog'
 
 export interface ITransactionFilterProps {
-	transactions: ITransaction[]
+	categories: string[]
 }
 
-export function TransactionFilter({ transactions }: ITransactionFilterProps) {
+export function FilterTransactionForm({ categories }: ITransactionFilterProps) {
 	const { filters, setFilters, resetFilters } = useFilter()
 	const { selectedCategory, transactionType, minAmount, maxAmount } = filters
 
-	const categories = useMemo(() => {
-		const uniqueCategories = new Set<string>()
-		transactions.forEach((transaction) => {
-			uniqueCategories.add(transaction.category)
-		})
-		return Array.from(uniqueCategories).sort()
-	}, [transactions])
-
 	return (
-		<div className="space-y-4">
+		<form className="space-y-4">
 			<div>
 				<Label className="mb-2 block font-medium text-gray-700 text-sm">Categorias</Label>
 				<div className="flex flex-wrap gap-2">
@@ -94,9 +85,14 @@ export function TransactionFilter({ transactions }: ITransactionFilterProps) {
 					/>
 				</div>
 			</div>
-			<Button type="button" variant="destructive" onClick={resetFilters} className="w-full">
-				Limpar Filtros
-			</Button>
-		</div>
+			<DialogFooter>
+				<Button variant="destructive" type="button" onClick={resetFilters}>
+					Limpar filtros
+				</Button>
+				<DialogClose asChild>
+					<Button type="button">Fechar</Button>
+				</DialogClose>
+			</DialogFooter>
+		</form>
 	)
 }

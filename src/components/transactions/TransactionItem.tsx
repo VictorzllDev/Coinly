@@ -1,8 +1,8 @@
 import { Trash2 } from 'lucide-react'
+import { CategoryBadge } from '@/components/ui/category-badge'
 import type { ITransaction } from '@/types/transaction'
 import { formatAmount } from '@/utils/formatAmount'
 import { formatDate } from '@/utils/formatDate'
-import { CategoryBadge } from './category-badge'
 
 interface TransactionListItemsProps {
 	transaction: ITransaction
@@ -12,14 +12,14 @@ export function TransactionItem({ transaction }: TransactionListItemsProps) {
 	return (
 		<li
 			key={transaction.id}
-			className="flex flex-row justify-between gap-2 overflow-hidden rounded-lg border border-gray-200 transition-colors active:bg-gray-100 hover:bg-gray-100"
+			className="flex flex-row justify-between overflow-hidden rounded-lg border border-gray-200 transition-colors"
 		>
 			<button
 				type="button"
 				onClick={() => {
 					console.log('Editar item nao feita')
 				}}
-				className="flex-1 cursor-pointer p-3"
+				className="flex-1 cursor-pointer p-3 hover:bg-gray-100 active:bg-gray-100"
 			>
 				<div className="flex flex-wrap items-baseline gap-2">
 					<strong className="text-gray-900">{transaction.description}</strong>
@@ -42,10 +42,10 @@ export function TransactionItem({ transaction }: TransactionListItemsProps) {
 						console.log('Deletar item nao feita')
 					}}
 					type="button"
-					className="flex h-full w-14 cursor-pointer items-center justify-center bg-red-500 text-white focus:outline-none active:bg-red-600 hover:bg-red-600"
+					className="flex h-full w-14 cursor-pointer items-center justify-center bg-red-500 text-white hover:bg-red-600 focus:outline-none active:bg-red-600"
 					title="Deletar transação"
 				>
-					<Trash2 size={18} />
+					<Trash2 size={20} />
 				</button>
 			</div>
 		</li>

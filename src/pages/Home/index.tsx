@@ -1,8 +1,7 @@
-import { Header } from '@/components/ui/header'
-import { Separator } from '@/components/ui/separator'
-import { TransactionFilter } from '@/components/ui/transaction-filter'
-import { TransactionForm } from '@/components/ui/transaction-form'
-import { TransactionList } from '@/components/ui/transaction-list'
+import { Header } from '@/components/layout/Header'
+import { CreateTransactionModal } from '@/components/modals/CreateTransactionModal'
+import { FilterTransactionModal } from '@/components/modals/FilterTransactionModal'
+import { TransactionList } from '@/components/transactions/TransactionList'
 import { FilterProvider } from '@/contexts/filterContext'
 import type { ITransaction } from '@/types/transaction'
 
@@ -60,11 +59,10 @@ export function Home() {
 				</div>
 
 				<div className="space-y-3">
-					<TransactionFilter transactions={transactions} />
-
-					<Separator className="my-4" />
-
-					<TransactionForm />
+					<div className="grid grid-cols-3 items-center gap-4">
+						<CreateTransactionModal />
+						<FilterTransactionModal transactions={transactions} />
+					</div>
 
 					<TransactionList transactions={transactions} />
 				</div>
