@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const signUpFormSchema = z.object({
@@ -15,11 +16,12 @@ const signUpFormSchema = z.object({
 export type SignUpFormInputs = z.infer<typeof signUpFormSchema>
 
 export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>) {
+	const { signUp } = useAuth()
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-		reset,
 	} = useForm<SignUpFormInputs>({
 		resolver: zodResolver(signUpFormSchema),
 		defaultValues: {
@@ -28,10 +30,8 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
 		},
 	})
 
-	const onSubmit = (data: SignUpFormInputs) => {
-		console.log('Dados do formulário:', data)
-
-		reset()
+	const onSubmit = ({ email, password }: SignUpFormInputs) => {
+		signUp.mutate({ email, password })
 	}
 
 	return (
@@ -53,7 +53,7 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
 					<Input id="password" type="password" {...register('password')} />
 					{errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 				</div>
-				<Button type="submit" className="w-full">
+				<Button type="submit" isLoading={signUp.isPending} className="w-full">
 					Criar conta
 				</Button>
 			</div>

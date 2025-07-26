@@ -1,11 +1,19 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Link, Navigate, Outlet } from '@tanstack/react-router'
 import placeholder from '@/assets/brand-reveal.mp4'
+import { Loading } from '@/components/shared/Loading'
+import { useAuth } from '@/hooks/useAuth'
 
 export const Route = createFileRoute('/_auth')({
 	component: AuthLayout,
 })
 
 function AuthLayout() {
+	const { isAuthenticated, isLoading } = useAuth()
+
+	if (isLoading) return <Loading />
+
+	if (isAuthenticated) return <Navigate to="/" replace />
+
 	return (
 		<div className="grid min-h-svh lg:grid-cols-2">
 			<div className="flex flex-col gap-4 p-6 md:p-10">

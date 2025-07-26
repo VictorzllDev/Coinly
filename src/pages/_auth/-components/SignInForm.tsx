@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const signInFormSchema = z.object({
@@ -15,11 +16,12 @@ const signInFormSchema = z.object({
 export type SignInFormInputs = z.infer<typeof signInFormSchema>
 
 export function SignInForm({ className, ...props }: React.ComponentProps<'form'>) {
+	const { googleSignIn, signIn } = useAuth()
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-		reset,
 	} = useForm<SignInFormInputs>({
 		resolver: zodResolver(signInFormSchema),
 		defaultValues: {
@@ -28,14 +30,12 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'form'>
 		},
 	})
 
-	const onSubmit = (data: SignInFormInputs) => {
-		console.log('Dados do formulário:', data)
-
-		reset()
+	const onSubmit = ({ email, password }: SignInFormInputs) => {
+		signIn.mutate({ email, password })
 	}
 
 	const handleGoogleSignIn = () => {
-		console.log('Login com Google')
+		googleSignIn.mutate()
 	}
 
 	return (
@@ -60,13 +60,19 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'form'>
 					<Input id="password" type="password" {...register('password')} />
 					{errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 				</div>
-				<Button type="submit" className="w-full">
+				<Button type="submit" isLoading={signIn.isPending} className="w-full">
 					Login
 				</Button>
 				<div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
 					<span className="relative z-10 bg-background px-2 text-muted-foreground">Ou continue com</span>
 				</div>
-				<Button type="button" variant="outline" onClick={handleGoogleSignIn} className="w-full">
+				<Button
+					type="button"
+					variant="outline"
+					onClick={handleGoogleSignIn}
+					isLoading={googleSignIn.isPending}
+					className="w-full cursor-pointer"
+				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
 						<title>Google</title>
 						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
