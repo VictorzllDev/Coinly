@@ -1,8 +1,10 @@
 export interface ITransaction {
-	id?: string
+	id: string
 	description: string
 	category: string
 	amount: number
 	date: Date
 	type: 'income' | 'expense'
 }
+
+export type ITransactionForm = Omit<ITransaction, 'id'>

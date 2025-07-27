@@ -8,14 +8,12 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
-import type { ITransaction } from '@/types/transaction'
+import { useFinance } from '@/hooks/useFinance'
 import { FilterTransactionForm } from '../forms/FilterTransactionForm'
 
-export interface IFilterTransactionModalProps {
-	transactions: ITransaction[]
-}
+export function FilterTransactionModal() {
+	const { transactions } = useFinance()
 
-export function FilterTransactionModal({ transactions }: IFilterTransactionModalProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const categories = useMemo(() => {

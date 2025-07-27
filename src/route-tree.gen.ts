@@ -13,6 +13,7 @@ import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as AuthSignUpRouteImport } from './pages/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
+import { Route as AppHomeLayoutRouteImport } from './pages/_app/_home/layout'
 import { Route as AppHomeIndexRouteImport } from './pages/_app/_home/index'
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
@@ -33,10 +34,14 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const AppHomeIndexRoute = AppHomeIndexRouteImport.update({
-  id: '/_home/',
-  path: '/',
+const AppHomeLayoutRoute = AppHomeLayoutRouteImport.update({
+  id: '/_home',
   getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppHomeIndexRoute = AppHomeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppHomeLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -53,6 +58,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
+  '/_app/_home': typeof AppHomeLayoutRouteWithChildren
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_app/_home/': typeof AppHomeIndexRoute
@@ -66,6 +72,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/_app/_home'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
     | '/_app/_home/'
@@ -106,22 +113,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_app/_home': {
+      id: '/_app/_home'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppHomeLayoutRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/_home/': {
       id: '/_app/_home/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppHomeIndexRouteImport
-      parentRoute: typeof AppLayoutRoute
+      parentRoute: typeof AppHomeLayoutRoute
     }
   }
 }
 
-interface AppLayoutRouteChildren {
+interface AppHomeLayoutRouteChildren {
   AppHomeIndexRoute: typeof AppHomeIndexRoute
 }
 
-const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+const AppHomeLayoutRouteChildren: AppHomeLayoutRouteChildren = {
   AppHomeIndexRoute: AppHomeIndexRoute,
+}
+
+const AppHomeLayoutRouteWithChildren = AppHomeLayoutRoute._addFileChildren(
+  AppHomeLayoutRouteChildren,
+)
+
+interface AppLayoutRouteChildren {
+  AppHomeLayoutRoute: typeof AppHomeLayoutRouteWithChildren
+}
+
+const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppHomeLayoutRoute: AppHomeLayoutRouteWithChildren,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(

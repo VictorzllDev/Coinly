@@ -10,15 +10,19 @@ import { DialogClose, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useFinance } from '@/hooks/useFinance'
+import { combineDateAndTime } from '@/utils/combineDateAndTime'
 import type { TransactionFormInputs } from '../modals/CreateTransactionModal'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
-export interface ITransactionFormProps {
+interface TransactionFormProps {
 	setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 	form: UseFormReturn<TransactionFormInputs>
 }
 
-export function TransactionForm({ setIsModalOpen, form }: ITransactionFormProps) {
+export function TransactionForm({ setIsModalOpen, form }: TransactionFormProps) {
+	const { createTransaction } = useFinance()
+
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
 	const {
@@ -29,8 +33,14 @@ export function TransactionForm({ setIsModalOpen, form }: ITransactionFormProps)
 		reset,
 	} = form
 
-	const onSubmit = (data: TransactionFormInputs) => {
-		console.log('Dados do formulário:', data)
+	const onSubmit = ({ amount, description, category, date, time, type }: TransactionFormInputs) => {
+		createTransaction.mutate({
+			amount,
+			description,
+			category,
+			date: combineDateAndTime({ date, time }),
+			type,
+		})
 
 		setIsModalOpen(false)
 		reset()
@@ -133,7 +143,7 @@ export function TransactionForm({ setIsModalOpen, form }: ITransactionFormProps)
 						render={({ field }) => (
 							<Select onValueChange={field.onChange} value={field.value}>
 								<SelectTrigger id="category" className="w-full">
-									<SelectValue placeholder="Categoria" />
+									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectGroup>
@@ -166,7 +176,7 @@ export function TransactionForm({ setIsModalOpen, form }: ITransactionFormProps)
 						render={({ field }) => (
 							<Select onValueChange={field.onChange} value={field.value}>
 								<SelectTrigger id="type" className="w-full">
-									<SelectValue placeholder="Transação" />
+									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectGroup>
