@@ -7,9 +7,10 @@ import { formatDate } from '@/utils/formatDate'
 interface TransactionListItemsProps {
 	transaction: ITransaction
 	onEdit: (transaction: ITransaction) => void
+	onDelete: (transaction: ITransaction) => void
 }
 
-export function TransactionItem({ transaction, onEdit }: TransactionListItemsProps) {
+export function TransactionItem({ transaction, onEdit, onDelete }: TransactionListItemsProps) {
 	return (
 		<li
 			key={transaction.id}
@@ -38,7 +39,7 @@ export function TransactionItem({ transaction, onEdit }: TransactionListItemsPro
 			<div>
 				<button
 					onClick={() => {
-						console.log('Deletar item nao feita')
+						onDelete(transaction)
 					}}
 					type="button"
 					className="flex h-full w-14 cursor-pointer items-center justify-center bg-red-500 text-white hover:bg-red-600 focus:outline-none active:bg-red-600"

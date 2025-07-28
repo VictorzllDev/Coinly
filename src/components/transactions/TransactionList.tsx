@@ -5,6 +5,7 @@ import { useFilter } from '@/hooks/useFilter'
 import { useFinance } from '@/hooks/useFinance'
 import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { DeleteTransactionModal } from '../modals/DeleteTransactionModal'
 import { EditTransactionModal } from '../modals/EditTransactionModal'
 import { TransactionItem } from './TransactionItem'
 import { TransactionItemSkeleton } from './TransactionItemSkeleton'
@@ -13,8 +14,9 @@ export function TransactionList() {
 	const { filters } = useFilter()
 	const { transactions, isLoading } = useFinance()
 
-	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [editValues, setEditValues] = useState<ITransaction | null>(null)
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+	const [transactionValues, setTransactionValues] = useState<ITransaction | null>(null)
 
 	const filteredTransactions = useMemo(() => {
 		const { selectedCategory, minAmount, maxAmount, transactionType } = filters
@@ -57,8 +59,13 @@ export function TransactionList() {
 	}, [filteredTransactions])
 
 	const handleEditTransaction = ({ id, amount, description, date, category, type }: ITransaction) => {
-		setEditValues({ id, amount, description, date, category, type })
-		setIsModalOpen(true)
+		setTransactionValues({ id, amount, description, date, category, type })
+		setIsEditModalOpen(true)
+	}
+
+	const handleDeleteTransaction = ({ id, amount, description, date, category, type }: ITransaction) => {
+		setTransactionValues({ id, amount, description, date, category, type })
+		setIsDeleteModalOpen(true)
 	}
 
 	if (isLoading) {
@@ -97,13 +104,27 @@ export function TransactionList() {
 				<span className="text-nowrap px-4 text-gray-500 text-sm">{sortedTransactions.length} Transações</span>
 			</div>
 
-			{editValues && <EditTransactionModal transaction={editValues} isOpen={isModalOpen} setIsOpen={setIsModalOpen} />}
+			{transactionValues && (
+				<EditTransactionModal transaction={transactionValues} isOpen={isEditModalOpen} setIsOpen={setIsEditModalOpen} />
+			)}
+			{transactionValues && (
+				<DeleteTransactionModal
+					transaction={transactionValues}
+					isOpen={isDeleteModalOpen}
+					setIsOpen={setIsDeleteModalOpen}
+				/>
+			)}
 
 			{sortedTransactions.map((transaction) =>
 				transaction.id.startsWith('temp') ? (
 					<TransactionItemSkeleton key={transaction.id} />
 				) : (
-					<TransactionItem key={transaction.id} transaction={transaction} onEdit={handleEditTransaction} />
+					<TransactionItem
+						key={transaction.id}
+						transaction={transaction}
+						onEdit={handleEditTransaction}
+						onDelete={handleDeleteTransaction}
+					/>
 				),
 			)}
 		</ul>
