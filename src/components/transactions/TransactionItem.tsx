@@ -6,9 +6,10 @@ import { formatDate } from '@/utils/formatDate'
 
 interface TransactionListItemsProps {
 	transaction: ITransaction
+	onEdit: (transaction: ITransaction) => void
 }
 
-export function TransactionItem({ transaction }: TransactionListItemsProps) {
+export function TransactionItem({ transaction, onEdit }: TransactionListItemsProps) {
 	return (
 		<li
 			key={transaction.id}
@@ -16,9 +17,7 @@ export function TransactionItem({ transaction }: TransactionListItemsProps) {
 		>
 			<button
 				type="button"
-				onClick={() => {
-					console.log('Editar item nao feita')
-				}}
+				onClick={() => onEdit(transaction)}
 				className="flex-1 cursor-pointer p-3 hover:bg-gray-100 active:bg-gray-100"
 			>
 				<div className="flex flex-wrap items-baseline gap-2">

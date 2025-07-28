@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -12,28 +11,17 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import { useFinance } from '@/hooks/useFinance'
+import { type ITransactionFormInputs, transactionFormSchema } from '@/types/transaction'
+import { combineDateAndTime } from '@/utils/combineDateAndTime'
 import { TransactionForm } from '../forms/TransactionForm'
 
-// Definindo o schema de validação com Zod
-const transactionFormSchema = z.object({
-	amount: z.number({ message: 'Digite um valor' }).min(0.01, 'Digite um valor maior que zero'),
-	description: z.string().min(3, 'Minimo 3 caracteres'),
-	date: z.date({
-		message: 'Selecione uma data',
-	}),
-	time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Formato de hora inválido'),
-	category: z.string({ message: 'Selecione uma categoria' }).min(3, 'Selecione uma categoria'),
-	type: z.union([z.literal('income'), z.literal('expense')], {
-		message: 'Selecione uma transação',
-	}),
-})
-
-export type TransactionFormInputs = z.infer<typeof transactionFormSchema>
-
 export function CreateTransactionModal() {
+	const { createTransaction } = useFinance()
+
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
-	const form = useForm<TransactionFormInputs>({
+	const form = useForm<ITransactionFormInputs>({
 		resolver: zodResolver(transactionFormSchema),
 		defaultValues: {
 			amount: 0,
@@ -44,6 +32,20 @@ export function CreateTransactionModal() {
 			type: 'income',
 		},
 	})
+
+	const onSubmit = ({ amount, description, category, date, time, type }: ITransactionFormInputs) => {
+		createTransaction.mutate({
+			amount,
+			description,
+			category,
+			date: combineDateAndTime({ date, time }),
+			time,
+			type,
+		})
+
+		setIsModalOpen(false)
+		form.reset()
+	}
 
 	return (
 		<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -59,7 +61,7 @@ export function CreateTransactionModal() {
 					<DialogDescription>Preencha os detalhes para adicionar uma nova transação.</DialogDescription>
 				</DialogHeader>
 
-				<TransactionForm setIsModalOpen={setIsModalOpen} form={form} />
+				<TransactionForm form={form} onSubmit={onSubmit} />
 			</DialogContent>
 		</Dialog>
 	)

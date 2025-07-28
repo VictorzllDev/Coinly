@@ -1,14 +1,15 @@
 import { type UseMutationResult, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore'
+import { addDoc, collection, doc, getDocs, onSnapshot, updateDoc } from 'firebase/firestore'
 import { createContext, useEffect, useMemo } from 'react'
 import { db } from '@/firebase/config'
 import { useAuth } from '@/hooks/useAuth'
-import type { ITransaction, ITransactionForm } from '@/types/transaction'
+import type { ITransaction, ITransactionFormInputs } from '@/types/transaction'
 
 interface FinanceContextType {
 	transactions: ITransaction[]
 	isLoading: boolean
-	createTransaction: UseMutationResult<ITransaction, Error, ITransactionForm, unknown>
+	createTransaction: UseMutationResult<ITransaction, Error, ITransactionFormInputs, unknown>
+	editTransaction: UseMutationResult<ITransaction, Error, ITransaction, unknown>
 }
 
 export const FinanceContext = createContext<FinanceContextType | undefined>(undefined)
@@ -56,7 +57,7 @@ export const FinanceProvider = ({ children }: { children: React.ReactNode }) => 
 		tempId?: string
 	}
 
-	const createTransaction = useMutation<ITransaction, Error, ITransactionForm, MutationContext>({
+	const createTransaction = useMutation<ITransaction, Error, ITransactionFormInputs, MutationContext>({
 		mutationFn: async ({ amount, description, category, date, type }) => {
 			const transactionData = { amount, description, category, date, type }
 			const ref = collection(db, 'users', user.uid, 'transactions')
@@ -97,13 +98,61 @@ export const FinanceProvider = ({ children }: { children: React.ReactNode }) => 
 		},
 	})
 
+	const editTransaction = useMutation<ITransaction, Error, ITransaction, MutationContext>({
+		mutationFn: async (transaction) => {
+			const { id, ...transactionData } = transaction
+			const docRef = doc(db, 'users', user.uid, 'transactions', id)
+			await updateDoc(docRef, transactionData)
+
+			return transaction as ITransaction
+		},
+		onMutate: async (updatedTransaction) => {
+			await queryClient.cancelQueries({ queryKey: ['transactions', user.uid] })
+			const previousTransactions = queryClient.getQueryData<ITransaction[]>(['transactions', user.uid]) || []
+
+			const tempTransaction = {
+				...updatedTransaction,
+				id: `temp-${updatedTransaction.id}`,
+			}
+
+			queryClient.setQueryData<ITransaction[]>(
+				['transactions', user.uid],
+				previousTransactions.map((tx) => (tx.id === updatedTransaction.id ? tempTransaction : tx)),
+			)
+
+			return { previousTransactions, tempId: updatedTransaction.id }
+		},
+		onError: (error, _variables, context) => {
+			console.error('Erro ao editar transação:', error)
+
+			if (context?.previousTransactions) {
+				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
+			}
+		},
+		onSuccess: (updatedTransaction, _variables, context) => {
+			const transactionWithOriginalId = {
+				...updatedTransaction,
+				id: context?.tempId || updatedTransaction.id,
+			}
+
+			queryClient.setQueryData<ITransaction[]>(['transactions', user.uid], (old = []) =>
+				old.map((tx) =>
+					tx.id === `temp-${transactionWithOriginalId.id}` || tx.id === transactionWithOriginalId.id
+						? transactionWithOriginalId
+						: tx,
+				),
+			)
+		},
+	})
+
 	const value = useMemo(
 		() => ({
 			transactions,
 			isLoading,
 			createTransaction,
+			editTransaction,
 		}),
-		[transactions, isLoading, createTransaction],
+		[transactions, isLoading, createTransaction, editTransaction],
 	)
 
 	return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>

@@ -10,19 +10,15 @@ import { DialogClose, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useFinance } from '@/hooks/useFinance'
-import { combineDateAndTime } from '@/utils/combineDateAndTime'
-import type { TransactionFormInputs } from '../modals/CreateTransactionModal'
+import type { ITransactionFormInputs } from '@/types/transaction'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 interface TransactionFormProps {
-	setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-	form: UseFormReturn<TransactionFormInputs>
+	form: UseFormReturn<ITransactionFormInputs>
+	onSubmit: (data: ITransactionFormInputs) => void
 }
 
-export function TransactionForm({ setIsModalOpen, form }: TransactionFormProps) {
-	const { createTransaction } = useFinance()
-
+export function TransactionForm({ form, onSubmit }: TransactionFormProps) {
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
 	const {
@@ -32,19 +28,6 @@ export function TransactionForm({ setIsModalOpen, form }: TransactionFormProps) 
 		formState: { errors },
 		reset,
 	} = form
-
-	const onSubmit = ({ amount, description, category, date, time, type }: TransactionFormInputs) => {
-		createTransaction.mutate({
-			amount,
-			description,
-			category,
-			date: combineDateAndTime({ date, time }),
-			type,
-		})
-
-		setIsModalOpen(false)
-		reset()
-	}
 
 	return (
 		<form className="grid gap-4 py-4" onSubmit={handleSubmit(onSubmit)}>
@@ -197,7 +180,7 @@ export function TransactionForm({ setIsModalOpen, form }: TransactionFormProps) 
 						Cancelar
 					</Button>
 				</DialogClose>
-				<Button type="submit">Criar</Button>
+				<Button type="submit">Editar</Button>
 			</DialogFooter>
 		</form>
 	)

@@ -1,4 +1,4 @@
-import { setHours, setMinutes } from 'date-fns'
+import { setHours, setMinutes, setSeconds } from 'date-fns'
 
 interface CombineDateAndTimeProps {
 	date: Date
@@ -6,6 +6,6 @@ interface CombineDateAndTimeProps {
 }
 
 export function combineDateAndTime({ date, time }: CombineDateAndTimeProps) {
-	const [hour, minute] = time.split(':').map(Number)
-	return setMinutes(setHours(date, hour), minute)
+	const [hour = 0, minute = 0, second = 0] = time.split(':').map(Number)
+	return setSeconds(setMinutes(setHours(date, hour), minute), second)
 }

@@ -1,15 +1,20 @@
 import { Loader2Icon } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { useFilter } from '@/hooks/useFilter'
 import { useFinance } from '@/hooks/useFinance'
+import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
+import { EditTransactionModal } from '../modals/EditTransactionModal'
 import { TransactionItem } from './TransactionItem'
 import { TransactionItemSkeleton } from './TransactionItemSkeleton'
 
 export function TransactionList() {
 	const { filters } = useFilter()
 	const { transactions, isLoading } = useFinance()
+
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [editValues, setEditValues] = useState<ITransaction | null>(null)
 
 	const filteredTransactions = useMemo(() => {
 		const { selectedCategory, minAmount, maxAmount, transactionType } = filters
@@ -35,18 +40,26 @@ export function TransactionList() {
 	}, [transactions, filters])
 
 	const sortedTransactions = useMemo(() => {
-		return [...filteredTransactions].sort((a, b) => {
-			const isATemp = a.id.startsWith('temp')
-			const isBTemp = b.id.startsWith('temp')
+		return [...filteredTransactions]
+			.map((transaction) => ({
+				...transaction,
+				date: firestoreDateToJSDate(transaction.date as unknown as Date),
+			}))
+			.sort((a, b) => {
+				const isATemp = a.id.startsWith('temp')
+				const isBTemp = b.id.startsWith('temp')
 
-			if (isATemp && !isBTemp) return -1
-			if (!isATemp && isBTemp) return 1
+				if (isATemp && !isBTemp) return -1
+				if (!isATemp && isBTemp) return 1
 
-			const dateA = firestoreDateToJSDate(a.date as unknown as Date).getTime()
-			const dateB = firestoreDateToJSDate(b.date as unknown as Date).getTime()
-			return dateB - dateA
-		})
+				return b.date.getTime() - a.date.getTime()
+			})
 	}, [filteredTransactions])
+
+	const handleEditTransaction = ({ id, amount, description, date, category, type }: ITransaction) => {
+		setEditValues({ id, amount, description, date, category, type })
+		setIsModalOpen(true)
+	}
 
 	if (isLoading) {
 		return (
@@ -84,11 +97,13 @@ export function TransactionList() {
 				<span className="text-nowrap px-4 text-gray-500 text-sm">{sortedTransactions.length} Transações</span>
 			</div>
 
+			{editValues && <EditTransactionModal transaction={editValues} isOpen={isModalOpen} setIsOpen={setIsModalOpen} />}
+
 			{sortedTransactions.map((transaction) =>
 				transaction.id.startsWith('temp') ? (
 					<TransactionItemSkeleton key={transaction.id} />
 				) : (
-					<TransactionItem key={transaction.id} transaction={transaction} />
+					<TransactionItem key={transaction.id} transaction={transaction} onEdit={handleEditTransaction} />
 				),
 			)}
 		</ul>
