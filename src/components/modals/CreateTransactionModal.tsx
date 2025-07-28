@@ -12,7 +12,8 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { useFinance } from '@/hooks/useFinance'
-import { type ITransactionFormInputs, transactionFormSchema } from '@/types/transaction'
+import { transactionFormSchema } from '@/schemas/transaction.schema'
+import type { ITransactionFormInputs } from '@/types/transaction'
 import { combineDateAndTime } from '@/utils/combineDateAndTime'
 import { TransactionForm } from '../forms/TransactionForm'
 

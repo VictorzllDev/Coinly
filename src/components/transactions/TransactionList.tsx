@@ -6,7 +6,7 @@ import { useFinance } from '@/hooks/useFinance'
 import type { ITransaction } from '@/types/transaction'
 import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
 import { DeleteTransactionModal } from '../modals/DeleteTransactionModal'
-import { EditTransactionModal } from '../modals/EditTransactionModal'
+import { UpdateTransactionModal } from '../modals/UpdateTransactionModal'
 import { TransactionItem } from './TransactionItem'
 import { TransactionItemSkeleton } from './TransactionItemSkeleton'
 
@@ -105,7 +105,11 @@ export function TransactionList() {
 			</div>
 
 			{transactionValues && (
-				<EditTransactionModal transaction={transactionValues} isOpen={isEditModalOpen} setIsOpen={setIsEditModalOpen} />
+				<UpdateTransactionModal
+					transaction={transactionValues}
+					isOpen={isEditModalOpen}
+					setIsOpen={setIsEditModalOpen}
+				/>
 			)}
 			{transactionValues && (
 				<DeleteTransactionModal

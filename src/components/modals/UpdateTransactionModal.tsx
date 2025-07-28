@@ -3,7 +3,8 @@ import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useFinance } from '@/hooks/useFinance'
-import { type ITransaction, type ITransactionFormInputs, transactionFormSchema } from '@/types/transaction'
+import { transactionFormSchema } from '@/schemas/transaction.schema'
+import type { ITransaction, ITransactionFormInputs } from '@/types/transaction'
 import { combineDateAndTime } from '@/utils/combineDateAndTime'
 import { TransactionForm } from '../forms/TransactionForm'
 
@@ -13,8 +14,8 @@ interface EditTransactionModalProps {
 	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function EditTransactionModal({ transaction, isOpen, setIsOpen }: EditTransactionModalProps) {
-	const { editTransaction } = useFinance()
+export function UpdateTransactionModal({ transaction, isOpen, setIsOpen }: EditTransactionModalProps) {
+	const { updateTransaction } = useFinance()
 
 	const { id, ...defaultValues } = transaction
 
@@ -27,7 +28,7 @@ export function EditTransactionModal({ transaction, isOpen, setIsOpen }: EditTra
 	})
 
 	const handleSubmit = ({ amount, description, category, date, time, type }: ITransactionFormInputs) => {
-		editTransaction.mutate({
+		updateTransaction.mutate({
 			id,
 			amount,
 			description,

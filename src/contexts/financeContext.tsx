@@ -1,21 +1,17 @@
-import { type UseMutationResult, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, updateDoc } from 'firebase/firestore'
+import { type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
+import { collection, getDocs, onSnapshot } from 'firebase/firestore'
 import { createContext, useEffect, useMemo } from 'react'
 import { db } from '@/firebase/config'
+import { useCreateTransaction, useDeleteTransaction, useUpdateTransaction } from '@/hooks/transaction'
 import { useAuth } from '@/hooks/useAuth'
-import type { ITransaction, ITransactionFormInputs } from '@/types/transaction'
-
-interface MutationContext {
-	previousTransactions?: ITransaction[]
-	tempId?: string
-}
+import type { IMutationContext, ITransaction, ITransactionFormInputs } from '@/types/transaction'
 
 interface FinanceContextType {
 	transactions: ITransaction[]
 	isLoading: boolean
-	createTransaction: UseMutationResult<ITransaction, Error, ITransactionFormInputs, MutationContext>
-	editTransaction: UseMutationResult<ITransaction, Error, ITransaction, MutationContext>
-	deleteTransaction: UseMutationResult<void, Error, string, MutationContext>
+	createTransaction: UseMutationResult<ITransaction, Error, ITransactionFormInputs, IMutationContext>
+	updateTransaction: UseMutationResult<ITransaction, Error, ITransaction, IMutationContext>
+	deleteTransaction: UseMutationResult<void, Error, string, IMutationContext>
 }
 
 export const FinanceContext = createContext<FinanceContextType | undefined>(undefined)
@@ -58,133 +54,19 @@ export const FinanceProvider = ({ children }: { children: React.ReactNode }) => 
 		return () => unsubscribe()
 	}, [user?.uid, queryClient])
 
-	const createTransaction = useMutation<ITransaction, Error, ITransactionFormInputs, MutationContext>({
-		mutationFn: async ({ amount, description, category, date, type }) => {
-			const transactionData = { amount, description, category, date, type }
-			const ref = collection(db, 'users', user.uid, 'transactions')
-			const docRef = await addDoc(ref, transactionData)
-
-			return {
-				id: docRef.id,
-				...transactionData,
-			} as ITransaction
-		},
-		onMutate: async (newTransaction) => {
-			await queryClient.cancelQueries({ queryKey: ['transactions', user.uid] })
-			const previousTransactions = queryClient.getQueryData<ITransaction[]>(['transactions', user.uid]) || []
-
-			const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-
-			queryClient.setQueryData<ITransaction[]>(
-				['transactions', user.uid],
-				[...previousTransactions, { id: tempId, ...newTransaction }],
-			)
-
-			return {
-				previousTransactions,
-				tempId,
-			}
-		},
-		onError: (error, _variables, context) => {
-			console.error('Erro ao criar transação:', error)
-
-			if (context?.previousTransactions) {
-				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
-			}
-		},
-		onSuccess: (createdTransaction, _variables, context) => {
-			queryClient.setQueryData<ITransaction[]>(['transactions', user.uid], (old = []) =>
-				old.map((tx) => (tx.id === context?.tempId ? createdTransaction : tx)),
-			)
-		},
-	})
-
-	const editTransaction = useMutation<ITransaction, Error, ITransaction, MutationContext>({
-		mutationFn: async (transaction) => {
-			const { id, ...transactionData } = transaction
-			const docRef = doc(db, 'users', user.uid, 'transactions', id)
-			await updateDoc(docRef, transactionData)
-
-			return transaction as ITransaction
-		},
-		onMutate: async (updatedTransaction) => {
-			await queryClient.cancelQueries({ queryKey: ['transactions', user.uid] })
-			const previousTransactions = queryClient.getQueryData<ITransaction[]>(['transactions', user.uid]) || []
-
-			const tempTransaction = {
-				...updatedTransaction,
-				id: `temp-${updatedTransaction.id}`,
-			}
-
-			queryClient.setQueryData<ITransaction[]>(
-				['transactions', user.uid],
-				previousTransactions.map((tx) => (tx.id === updatedTransaction.id ? tempTransaction : tx)),
-			)
-
-			return { previousTransactions, tempId: updatedTransaction.id }
-		},
-		onError: (error, _variables, context) => {
-			console.error('Erro ao editar transação:', error)
-
-			if (context?.previousTransactions) {
-				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
-			}
-		},
-		onSuccess: (updatedTransaction, _variables, context) => {
-			const transactionWithOriginalId = {
-				...updatedTransaction,
-				id: context?.tempId || updatedTransaction.id,
-			}
-
-			queryClient.setQueryData<ITransaction[]>(['transactions', user.uid], (old = []) =>
-				old.map((tx) =>
-					tx.id === `temp-${transactionWithOriginalId.id}` || tx.id === transactionWithOriginalId.id
-						? transactionWithOriginalId
-						: tx,
-				),
-			)
-		},
-	})
-
-	const deleteTransaction = useMutation<void, Error, string, MutationContext>({
-		mutationFn: async (transactionId) => {
-			const docRef = doc(db, 'users', user.uid, 'transactions', transactionId)
-			await deleteDoc(docRef)
-		},
-		onMutate: async (transactionId) => {
-			await queryClient.cancelQueries({ queryKey: ['transactions', user.uid] })
-			const previousTransactions = queryClient.getQueryData<ITransaction[]>(['transactions', user.uid]) || []
-
-			queryClient.setQueryData<ITransaction[]>(
-				['transactions', user.uid],
-				previousTransactions.filter((tx) => tx.id !== transactionId),
-			)
-
-			return { previousTransactions }
-		},
-		onError: (error, _variables, context) => {
-			console.error('Erro ao deletar transação:', error)
-
-			if (context?.previousTransactions) {
-				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
-			}
-		},
-		onSuccess: (_data, transactionId) => {
-			queryClient.setQueryData<ITransaction[]>(['transactions', user.uid], (old = []) =>
-				old.filter((tx) => tx.id !== transactionId),
-			)
-		},
-	})
+	const createTransaction = useCreateTransaction({ user, queryClient })
+	const updateTransaction = useUpdateTransaction({ user, queryClient })
+	const deleteTransaction = useDeleteTransaction({ user, queryClient })
 
 	const value = useMemo(
 		() => ({
 			transactions,
 			isLoading,
 			createTransaction,
-			editTransaction,
+			updateTransaction,
 			deleteTransaction,
 		}),
-		[transactions, isLoading, createTransaction, editTransaction, deleteTransaction],
+		[transactions, isLoading, createTransaction, updateTransaction, deleteTransaction],
 	)
 
 	return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>
