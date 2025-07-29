@@ -62,7 +62,7 @@ export function CreateTransactionModal() {
 					<DialogDescription>Preencha os detalhes para adicionar uma nova transação.</DialogDescription>
 				</DialogHeader>
 
-				<TransactionForm form={form} onSubmit={onSubmit} />
+				<TransactionForm form={form} onSubmit={onSubmit} buttonLabel="Criar" />
 			</DialogContent>
 		</Dialog>
 	)

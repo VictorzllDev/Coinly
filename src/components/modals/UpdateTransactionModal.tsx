@@ -49,7 +49,7 @@ export function UpdateTransactionModal({ transaction, isOpen, setIsOpen }: EditT
 					<DialogDescription>Altere os detalhes para editar a transação.</DialogDescription>
 				</DialogHeader>
 
-				<TransactionForm form={form} onSubmit={handleSubmit} />
+				<TransactionForm form={form} onSubmit={handleSubmit} buttonLabel="Salvar alterações" />
 			</DialogContent>
 		</Dialog>
 	)

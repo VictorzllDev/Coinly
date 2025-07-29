@@ -16,9 +16,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 interface TransactionFormProps {
 	form: UseFormReturn<ITransactionFormInputs>
 	onSubmit: (data: ITransactionFormInputs) => void
+	buttonLabel: string
 }
 
-export function TransactionForm({ form, onSubmit }: TransactionFormProps) {
+export function TransactionForm({ form, onSubmit, buttonLabel }: TransactionFormProps) {
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
 	const {
@@ -180,7 +181,7 @@ export function TransactionForm({ form, onSubmit }: TransactionFormProps) {
 						Cancelar
 					</Button>
 				</DialogClose>
-				<Button type="submit">Editar</Button>
+				<Button type="submit">{buttonLabel}</Button>
 			</DialogFooter>
 		</form>
 	)
