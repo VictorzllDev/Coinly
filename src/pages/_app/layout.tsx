@@ -1,4 +1,5 @@
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router'
+import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 import { Loading } from '@/components/shared/Loading'
 import { useAuth } from '@/hooks/useAuth'
@@ -17,7 +18,10 @@ function AppLayout() {
 	return (
 		<>
 			<Header />
-			<Outlet />
+			<div className="py-16">
+				<Outlet />
+			</div>
+			<BottomNav />
 		</>
 	)
 }

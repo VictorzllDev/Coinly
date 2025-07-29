@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { FinanceProvider } from '@/contexts/financeContext'
 
-export const Route = createFileRoute('/_app/_home')({
+export const Route = createFileRoute('/_app/transaction')({
 	component: HomeLayout,
 })
 

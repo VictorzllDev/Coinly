@@ -4,14 +4,14 @@ import { FilterTransactionModal } from '@/components/modals/FilterTransactionMod
 import { TransactionList } from '@/components/transactions/TransactionList'
 import { FilterProvider } from '@/contexts/filterContext'
 
-export const Route = createFileRoute('/_app/_home/')({
+export const Route = createFileRoute('/_app/transaction/')({
 	component: Home,
 })
 
 export function Home() {
 	return (
 		<FilterProvider>
-			<main className="mt-16 p-2">
+			<main className="p-2">
 				<div className="my-4 flex flex-wrap items-center justify-between gap-x-2 ">
 					<h2 className="font-bold text-gray-800 text-xl">Transações Financeiras</h2>
 				</div>

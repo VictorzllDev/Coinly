@@ -13,8 +13,9 @@ import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as AuthSignUpRouteImport } from './pages/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
-import { Route as AppHomeLayoutRouteImport } from './pages/_app/_home/layout'
-import { Route as AppHomeIndexRouteImport } from './pages/_app/_home/index'
+import { Route as AppTransactionLayoutRouteImport } from './pages/_app/transaction/layout'
+import { Route as AppTransactionIndexRouteImport } from './pages/_app/transaction/index'
+import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth',
@@ -34,48 +35,59 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const AppHomeLayoutRoute = AppHomeLayoutRouteImport.update({
-  id: '/_home',
+const AppTransactionLayoutRoute = AppTransactionLayoutRouteImport.update({
+  id: '/transaction',
+  path: '/transaction',
   getParentRoute: () => AppLayoutRoute,
 } as any)
-const AppHomeIndexRoute = AppHomeIndexRouteImport.update({
+const AppTransactionIndexRoute = AppTransactionIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppHomeLayoutRoute,
+  getParentRoute: () => AppTransactionLayoutRoute,
+} as any)
+const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
+  id: '/_dashboard/',
+  path: '/',
+  getParentRoute: () => AppLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/transaction': typeof AppTransactionLayoutRouteWithChildren
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/': typeof AppHomeIndexRoute
+  '/': typeof AppDashboardIndexRoute
+  '/transaction/': typeof AppTransactionIndexRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
   '/sign-up': typeof AuthSignUpRoute
-  '/': typeof AppHomeIndexRoute
+  '/': typeof AppDashboardIndexRoute
+  '/transaction': typeof AppTransactionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
-  '/_app/_home': typeof AppHomeLayoutRouteWithChildren
+  '/_app/transaction': typeof AppTransactionLayoutRouteWithChildren
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
-  '/_app/_home/': typeof AppHomeIndexRoute
+  '/_app/_dashboard/': typeof AppDashboardIndexRoute
+  '/_app/transaction/': typeof AppTransactionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sign-in' | '/sign-up' | '/'
+  fullPaths: '/transaction' | '/sign-in' | '/sign-up' | '/' | '/transaction/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/sign-up' | '/'
+  to: '/sign-in' | '/sign-up' | '/' | '/transaction'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
-    | '/_app/_home'
+    | '/_app/transaction'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
-    | '/_app/_home/'
+    | '/_app/_dashboard/'
+    | '/_app/transaction/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,41 +125,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
-    '/_app/_home': {
-      id: '/_app/_home'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AppHomeLayoutRouteImport
+    '/_app/transaction': {
+      id: '/_app/transaction'
+      path: '/transaction'
+      fullPath: '/transaction'
+      preLoaderRoute: typeof AppTransactionLayoutRouteImport
       parentRoute: typeof AppLayoutRoute
     }
-    '/_app/_home/': {
-      id: '/_app/_home/'
+    '/_app/transaction/': {
+      id: '/_app/transaction/'
+      path: '/'
+      fullPath: '/transaction/'
+      preLoaderRoute: typeof AppTransactionIndexRouteImport
+      parentRoute: typeof AppTransactionLayoutRoute
+    }
+    '/_app/_dashboard/': {
+      id: '/_app/_dashboard/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AppHomeIndexRouteImport
-      parentRoute: typeof AppHomeLayoutRoute
+      preLoaderRoute: typeof AppDashboardIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
     }
   }
 }
 
-interface AppHomeLayoutRouteChildren {
-  AppHomeIndexRoute: typeof AppHomeIndexRoute
+interface AppTransactionLayoutRouteChildren {
+  AppTransactionIndexRoute: typeof AppTransactionIndexRoute
 }
 
-const AppHomeLayoutRouteChildren: AppHomeLayoutRouteChildren = {
-  AppHomeIndexRoute: AppHomeIndexRoute,
+const AppTransactionLayoutRouteChildren: AppTransactionLayoutRouteChildren = {
+  AppTransactionIndexRoute: AppTransactionIndexRoute,
 }
 
-const AppHomeLayoutRouteWithChildren = AppHomeLayoutRoute._addFileChildren(
-  AppHomeLayoutRouteChildren,
-)
+const AppTransactionLayoutRouteWithChildren =
+  AppTransactionLayoutRoute._addFileChildren(AppTransactionLayoutRouteChildren)
 
 interface AppLayoutRouteChildren {
-  AppHomeLayoutRoute: typeof AppHomeLayoutRouteWithChildren
+  AppTransactionLayoutRoute: typeof AppTransactionLayoutRouteWithChildren
+  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
-  AppHomeLayoutRoute: AppHomeLayoutRouteWithChildren,
+  AppTransactionLayoutRoute: AppTransactionLayoutRouteWithChildren,
+  AppDashboardIndexRoute: AppDashboardIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
