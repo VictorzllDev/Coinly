@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { CreateTransactionModal } from '@/components/modals/CreateTransactionModal'
 import { FilterTransactionModal } from '@/components/modals/FilterTransactionModal'
 import { TransactionList } from '@/components/transactions/TransactionList'
-import { FilterProvider } from '@/contexts/filterContext'
+import { TransactionFilterProvider } from '@/contexts/transactionFilterContext'
 
 export const Route = createFileRoute('/_app/transaction/')({
 	component: Home,
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_app/transaction/')({
 
 export function Home() {
 	return (
-		<FilterProvider>
+		<TransactionFilterProvider>
 			<main className="p-2">
 				<div className="my-4 flex flex-wrap items-center justify-between gap-x-2 ">
 					<h2 className="font-bold text-gray-800 text-xl">Transações Financeiras</h2>
@@ -25,6 +25,6 @@ export function Home() {
 					<TransactionList />
 				</div>
 			</main>
-		</FilterProvider>
+		</TransactionFilterProvider>
 	)
 }

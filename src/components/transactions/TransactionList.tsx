@@ -1,62 +1,21 @@
 import { Loader2Icon } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { useFilter } from '@/hooks/useFilter'
 import { useFinance } from '@/hooks/useFinance'
+import { useTransactionFilter } from '@/hooks/useTransactionFilter'
 import type { ITransaction } from '@/types/transaction'
-import { firestoreDateToJSDate } from '@/utils/firestoreDateToJSDate'
 import { DeleteTransactionModal } from '../modals/DeleteTransactionModal'
 import { UpdateTransactionModal } from '../modals/UpdateTransactionModal'
 import { TransactionItem } from './TransactionItem'
 import { TransactionItemSkeleton } from './TransactionItemSkeleton'
 
 export function TransactionList() {
-	const { filters } = useFilter()
-	const { transactions, isLoading } = useFinance()
+	const { filtered } = useTransactionFilter()
+	const { isLoading } = useFinance()
 
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 	const [transactionValues, setTransactionValues] = useState<ITransaction | null>(null)
-
-	const filteredTransactions = useMemo(() => {
-		const { selectedCategory, minAmount, maxAmount, transactionType } = filters
-		let result = [...transactions]
-
-		if (selectedCategory) {
-			result = result.filter((transaction) => transaction.category === selectedCategory)
-		}
-
-		if (transactionType !== 'all') {
-			result = result.filter((transaction) => transaction.type === transactionType)
-		}
-
-		if (minAmount) {
-			result = result.filter((transaction) => Math.abs(transaction.amount) >= minAmount)
-		}
-
-		if (maxAmount) {
-			result = result.filter((transaction) => Math.abs(transaction.amount) <= maxAmount)
-		}
-
-		return result
-	}, [transactions, filters])
-
-	const sortedTransactions = useMemo(() => {
-		return [...filteredTransactions]
-			.map((transaction) => ({
-				...transaction,
-				date: firestoreDateToJSDate(transaction.date as unknown as Date),
-			}))
-			.sort((a, b) => {
-				const isATemp = a.id.startsWith('temp')
-				const isBTemp = b.id.startsWith('temp')
-
-				if (isATemp && !isBTemp) return -1
-				if (!isATemp && isBTemp) return 1
-
-				return b.date.getTime() - a.date.getTime()
-			})
-	}, [filteredTransactions])
 
 	const handleEditTransaction = ({ id, amount, description, date, category, type }: ITransaction) => {
 		setTransactionValues({ id, amount, description, date, category, type })
@@ -87,7 +46,7 @@ export function TransactionList() {
 		)
 	}
 
-	if (sortedTransactions.length === 0) {
+	if (filtered.length === 0) {
 		return (
 			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
 				Nenhuma transação encontrada
@@ -101,7 +60,7 @@ export function TransactionList() {
 				<span className="w-full pl-4">
 					<Separator />
 				</span>
-				<span className="text-nowrap px-4 text-gray-500 text-sm">{sortedTransactions.length} Transações</span>
+				<span className="text-nowrap px-4 text-gray-500 text-sm">{filtered.length} Transações</span>
 			</div>
 
 			{transactionValues && (
@@ -119,7 +78,7 @@ export function TransactionList() {
 				/>
 			)}
 
-			{sortedTransactions.map((transaction) =>
+			{filtered.map((transaction) =>
 				transaction.id.startsWith('temp') ? (
 					<TransactionItemSkeleton key={transaction.id} />
 				) : (

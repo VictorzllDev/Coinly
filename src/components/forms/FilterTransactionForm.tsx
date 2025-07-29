@@ -3,7 +3,7 @@ import { getCategoryColor } from '@/components/ui/category-badge'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useFilter } from '@/hooks/useFilter'
+import { useTransactionFilter } from '@/hooks/useTransactionFilter'
 import { DialogClose, DialogFooter } from '../ui/dialog'
 
 export interface ITransactionFilterProps {
@@ -11,7 +11,7 @@ export interface ITransactionFilterProps {
 }
 
 export function FilterTransactionForm({ categories }: ITransactionFilterProps) {
-	const { filters, setFilters, resetFilters } = useFilter()
+	const { filters, setFilters, resetFilters } = useTransactionFilter()
 	const { selectedCategory, transactionType, minAmount, maxAmount } = filters
 
 	return (
