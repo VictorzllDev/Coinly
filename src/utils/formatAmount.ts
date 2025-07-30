@@ -24,7 +24,7 @@ export function formatAmount({ amount, type }: IFormatAmountProps) {
 			break
 	}
 
-	const symbolAmount = `${symbol} ${formattedAmount}`
+	const symbolAmount = `${symbol}${formattedAmount}`
 
 	return symbolAmount.trim()
 }
