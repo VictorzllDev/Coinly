@@ -14,6 +14,7 @@ import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as AuthSignUpRouteImport } from './pages/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
 import { Route as AppTransactionLayoutRouteImport } from './pages/_app/transaction/layout'
+import { Route as AppDashboardLayoutRouteImport } from './pages/_app/_dashboard/layout'
 import { Route as AppTransactionIndexRouteImport } from './pages/_app/transaction/index'
 import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
 
@@ -40,15 +41,19 @@ const AppTransactionLayoutRoute = AppTransactionLayoutRouteImport.update({
   path: '/transaction',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppDashboardLayoutRoute = AppDashboardLayoutRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppTransactionIndexRoute = AppTransactionIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppTransactionLayoutRoute,
 } as any)
 const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
-  id: '/_dashboard/',
+  id: '/',
   path: '/',
-  getParentRoute: () => AppLayoutRoute,
+  getParentRoute: () => AppDashboardLayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -68,6 +73,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
+  '/_app/_dashboard': typeof AppDashboardLayoutRouteWithChildren
   '/_app/transaction': typeof AppTransactionLayoutRouteWithChildren
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
@@ -83,6 +89,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/_app/_dashboard'
     | '/_app/transaction'
     | '/_auth/sign-in'
     | '/_auth/sign-up'
@@ -132,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTransactionLayoutRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/_dashboard': {
+      id: '/_app/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppDashboardLayoutRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/transaction/': {
       id: '/_app/transaction/'
       path: '/'
@@ -144,10 +158,21 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppDashboardIndexRouteImport
-      parentRoute: typeof AppLayoutRoute
+      parentRoute: typeof AppDashboardLayoutRoute
     }
   }
 }
+
+interface AppDashboardLayoutRouteChildren {
+  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
+}
+
+const AppDashboardLayoutRouteChildren: AppDashboardLayoutRouteChildren = {
+  AppDashboardIndexRoute: AppDashboardIndexRoute,
+}
+
+const AppDashboardLayoutRouteWithChildren =
+  AppDashboardLayoutRoute._addFileChildren(AppDashboardLayoutRouteChildren)
 
 interface AppTransactionLayoutRouteChildren {
   AppTransactionIndexRoute: typeof AppTransactionIndexRoute
@@ -161,13 +186,13 @@ const AppTransactionLayoutRouteWithChildren =
   AppTransactionLayoutRoute._addFileChildren(AppTransactionLayoutRouteChildren)
 
 interface AppLayoutRouteChildren {
+  AppDashboardLayoutRoute: typeof AppDashboardLayoutRouteWithChildren
   AppTransactionLayoutRoute: typeof AppTransactionLayoutRouteWithChildren
-  AppDashboardIndexRoute: typeof AppDashboardIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppDashboardLayoutRoute: AppDashboardLayoutRouteWithChildren,
   AppTransactionLayoutRoute: AppTransactionLayoutRouteWithChildren,
-  AppDashboardIndexRoute: AppDashboardIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(

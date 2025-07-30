@@ -9,10 +9,12 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { useFinance } from '@/hooks/useFinance'
+import { useTransactionFilter } from '@/hooks/useTransactionFilter'
 import { FilterTransactionForm } from '../forms/FilterTransactionForm'
 
 export function FilterTransactionModal() {
 	const { transactions } = useFinance()
+	const { filters, filtered } = useTransactionFilter()
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -24,11 +26,14 @@ export function FilterTransactionModal() {
 		return Array.from(uniqueCategories).sort()
 	}, [transactions])
 
+	const isFilterActive =
+		filters.selectedCategory || filters.minAmount || filters.maxAmount || filters.transactionType !== 'all'
+
 	return (
 		<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
 			<DialogTrigger asChild>
 				<Button variant="outline" className="w-full">
-					Filtros
+					{isFilterActive ? `Filtros (${filtered.length})` : 'Filtros'}
 				</Button>
 			</DialogTrigger>
 

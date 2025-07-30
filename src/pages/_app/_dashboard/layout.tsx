@@ -1,11 +1,11 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { TransactionFilterProvider } from '@/contexts/transactionFilterContext'
 
-export const Route = createFileRoute('/_app/transaction')({
-	component: TransactionLayout,
+export const Route = createFileRoute('/_app/_dashboard')({
+	component: DashboardLayout,
 })
 
-function TransactionLayout() {
+function DashboardLayout() {
 	return (
 		<TransactionFilterProvider>
 			<Outlet />

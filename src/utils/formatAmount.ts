@@ -1,10 +1,30 @@
-import type { ITransaction } from '@/types/transaction'
-
 export interface IFormatAmountProps {
 	amount: number
-	type: ITransaction['type']
+	type?: 'income' | 'expense'
 }
 
 export function formatAmount({ amount, type }: IFormatAmountProps) {
-	return `${type === 'income' ? '+' : '-'}R$ ${Math.abs(amount).toFixed(2)}`
+	const formattedAmount = amount.toLocaleString('pt-BR', {
+		style: 'currency',
+		currency: 'BRL',
+	})
+
+	let symbol: string
+	switch (type) {
+		case 'income':
+			symbol = '+'
+			break
+
+		case 'expense':
+			symbol = '-'
+			break
+
+		default:
+			symbol = ''
+			break
+	}
+
+	const symbolAmount = `${symbol} ${formattedAmount}`
+
+	return symbolAmount.trim()
 }
