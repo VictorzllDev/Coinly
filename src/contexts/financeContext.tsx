@@ -2,8 +2,8 @@ import { type UseMutationResult, useQuery, useQueryClient } from '@tanstack/reac
 import { collection, getDocs, onSnapshot } from 'firebase/firestore'
 import { createContext, useEffect, useMemo } from 'react'
 import { db } from '@/firebase/config'
+import { useAuth } from '@/hooks/auth/useAuth'
 import { useCreateTransaction, useDeleteTransaction, useUpdateTransaction } from '@/hooks/transaction'
-import { useAuth } from '@/hooks/useAuth'
 import type { IMutationContext, ITransaction, ITransactionFormInputs } from '@/types/transaction'
 
 interface FinanceContextType {

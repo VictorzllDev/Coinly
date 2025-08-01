@@ -10,7 +10,7 @@ import {
 } from 'firebase/auth'
 import { createContext, useEffect, useMemo, useState } from 'react'
 import { auth } from '@/firebase/config'
-import { useCreateUserDocument } from '@/hooks/useCreateUserDocument'
+import { useCreateUserDocument } from '@/hooks/auth/useCreateUserDocument'
 import type { ISignIn } from '@/types/auth'
 
 interface AuthContextType {
