@@ -9,12 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './pages/__root'
-import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
-import { Route as AppLayoutRouteImport } from './pages/_app/layout'
+import { Route as AuthLayoutRouteImport } from './pages/_auth/_layout'
+import { Route as AppLayoutRouteImport } from './pages/_app/_layout'
 import { Route as AuthSignUpRouteImport } from './pages/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './pages/_auth/sign-in'
-import { Route as AppTransactionLayoutRouteImport } from './pages/_app/transaction/layout'
-import { Route as AppDashboardLayoutRouteImport } from './pages/_app/_dashboard/layout'
+import { Route as AppTransactionLayoutRouteImport } from './pages/_app/transaction/_layout'
+import { Route as AppDashboardLayoutRouteImport } from './pages/_app/_dashboard/_layout'
 import { Route as AppTransactionIndexRouteImport } from './pages/_app/transaction/index'
 import { Route as AppDashboardIndexRouteImport } from './pages/_app/_dashboard/index'
 
