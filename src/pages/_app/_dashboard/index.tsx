@@ -30,9 +30,9 @@ function Dashboard() {
 	const currentBalance = totalIncome + totalExpenses
 
 	return (
-		<main className="space-y-6 p-2 md:p-6">
+		<main className="space-y-6 px-4">
 			<div className="my-4 space-y-1 ">
-				<h1 className="font-bold text-2xl tracking-tight md:text-3xl">Dashboard</h1>
+				<h1 className="font-bold text-2xl tracking-tight sm:text-3xl">Dashboard</h1>
 				<p className="text-muted-foreground text-sm md:text-base">Aqui está um resumo de sua atividade financeira.</p>
 			</div>
 			<div className="flex flex-row items-center justify-between gap-x-2 ">
