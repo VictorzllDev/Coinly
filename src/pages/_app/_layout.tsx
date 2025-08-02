@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/useMobile'
 import { BottomNav } from './-components/layout/BottomNav'
 import { Header } from './-components/layout/Header'
 import { AppSidebar } from './-components/layout/Sidebar/'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/_app')({
 	component: AppLayout,
@@ -35,7 +36,7 @@ function AppLayout() {
 					<Header />
 					<div className="flex flex-1 flex-col">
 						<div className="@container/main flex flex-1 flex-col gap-2">
-							<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+							<div className={cn('flex flex-col gap-4 py-4 md:gap-6 md:py-6', isMobile && 'mb-16')}>
 								<Outlet />
 							</div>
 						</div>

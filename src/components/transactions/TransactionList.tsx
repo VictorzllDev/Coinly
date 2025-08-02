@@ -31,7 +31,7 @@ export function TransactionList() {
 		return (
 			<ul className="space-y-3">
 				<div className="flex items-center justify-end">
-					<span className="w-full pl-4">
+					<span className="w-full">
 						<Separator />
 					</span>
 					<span className="flex items-center gap-1 text-nowrap px-4 text-gray-500 text-sm">
@@ -57,7 +57,7 @@ export function TransactionList() {
 	return (
 		<ul className="space-y-3">
 			<div className="flex items-center justify-end">
-				<span className="w-full pl-4">
+				<span className="w-full">
 					<Separator />
 				</span>
 				<span className="text-nowrap px-4 text-gray-500 text-sm">{filtered.length} Transações</span>

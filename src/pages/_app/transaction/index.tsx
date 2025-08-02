@@ -9,16 +9,23 @@ export const Route = createFileRoute('/_app/transaction/')({
 
 export function Home() {
 	return (
-		<main className="p-2">
-			<div className="my-4 flex flex-wrap items-center justify-between gap-x-2 ">
-				<h2 className="font-bold text-gray-800 text-xl">Transações Financeiras</h2>
+		<main className="space-y-6 px-4">
+			<div className="my-4 space-y-1 ">
+				<h1 className="font-bold text-2xl tracking-tight sm:text-3xl">Transações</h1>
+				<p className="text-muted-foreground text-sm md:text-base">Aqui você gerencia suas finanças</p>
 			</div>
-
-			<div className="space-y-3">
-				<div className="grid grid-cols-3 items-center gap-4">
+			<div className="flex flex-row items-center justify-start gap-x-2">
+				<div className="w-full max-w-[320px]">
 					<CreateTransactionModal />
+				</div>
+
+				<div className="w-full max-w-[200px]">
 					<FilterTransactionModal />
 				</div>
+			</div>
+
+			<div>
+				<div className="grid grid-cols-3 items-center gap-4"></div>
 
 				<TransactionList />
 			</div>
