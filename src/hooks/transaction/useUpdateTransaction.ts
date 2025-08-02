@@ -1,5 +1,6 @@
 import { type QueryClient, useMutation } from '@tanstack/react-query'
 import type { UserCredential } from 'firebase/auth'
+import { toast } from 'sonner'
 import { updateTransaction } from '@/services/transaction/update'
 import type { IMutationContext, ITransaction } from '@/types/transaction'
 
@@ -33,6 +34,10 @@ export function useUpdateTransaction({ user, queryClient }: UseUpdateTransaction
 			if (context?.previousTransactions) {
 				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
 			}
+
+			toast.error('Erro ao editar transação!', {
+				description: error.message,
+			})
 		},
 		onSuccess: (updatedTransaction, _variables, context) => {
 			const transactionWithOriginalId = {
@@ -47,6 +52,8 @@ export function useUpdateTransaction({ user, queryClient }: UseUpdateTransaction
 						: tx,
 				),
 			)
+
+			toast.success('Transação editada com sucesso!')
 		},
 	})
 }

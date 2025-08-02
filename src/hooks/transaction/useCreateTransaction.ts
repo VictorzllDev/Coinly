@@ -1,5 +1,6 @@
 import { type QueryClient, useMutation } from '@tanstack/react-query'
 import type { UserCredential } from 'firebase/auth'
+import { toast } from 'sonner'
 import { createTransaction } from '@/services/transaction/create'
 import type { IMutationContext, ITransaction, ITransactionFormInputs } from '@/types/transaction'
 
@@ -33,11 +34,17 @@ export function useCreateTransaction({ user, queryClient }: UseCreateTransaction
 			if (context?.previousTransactions) {
 				queryClient.setQueryData(['transactions', user.uid], context.previousTransactions)
 			}
+
+			toast.error('Erro ao criar transação!', {
+				description: error.message,
+			})
 		},
 		onSuccess: (createdTransaction, _variables, context) => {
 			queryClient.setQueryData<ITransaction[]>(['transactions', user.uid], (old = []) =>
 				old.map((tx) => (tx.id === context?.tempId ? createdTransaction : tx)),
 			)
+
+			toast.success('Transação criada com sucesso!')
 		},
 	})
 }

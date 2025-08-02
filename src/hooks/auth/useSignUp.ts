@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { signUpWithEmail } from '@/services/auth/signUpWithEmail'
 import type { IUser } from '@/types/auth'
 
@@ -9,6 +10,15 @@ interface UseSignUp {
 export function useSignUp({ setUser }: UseSignUp) {
 	return useMutation({
 		mutationFn: signUpWithEmail,
-		onSuccess: (user) => setUser(user),
+		onError: (error) => {
+			console.log('Erro ao realizar o cadastro:', error)
+			toast.error('Erro ao realizar o cadastro!', {
+				description: error.message,
+			})
+		},
+		onSuccess: (user) => {
+			setUser(user)
+			toast('Conta criada! Explore agora seu painel.')
+		},
 	})
 }

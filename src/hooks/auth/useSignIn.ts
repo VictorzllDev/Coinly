@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { signInWithEmail } from '@/services/auth/signInWithEmail'
 import type { IUser } from '@/types/auth'
 
@@ -9,6 +10,15 @@ interface UseSignIn {
 export function useSignIn({ setUser }: UseSignIn) {
 	return useMutation({
 		mutationFn: signInWithEmail,
-		onSuccess: (user) => setUser(user),
+		onError: (error) => {
+			console.log('Erro ao realizar o login:', error)
+			toast.error('Erro ao realizar o login!', {
+				description: error.message,
+			})
+		},
+		onSuccess: (user) => {
+			setUser(user)
+			toast('Login realizado com sucesso!')
+		},
 	})
 }
