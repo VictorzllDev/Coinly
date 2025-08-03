@@ -1,5 +1,6 @@
 import { type Icon, IconCirclePlusFilled } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
+import { ModeToggle } from '@/components/shared/ModeToggle'
 import { Separator } from '@/components/ui/separator'
 import {
 	SidebarGroup,
@@ -30,6 +31,7 @@ export function NavMain({
 							<IconCirclePlusFilled />
 							<span>Nova Transacao</span>
 						</SidebarMenuButton>
+						<ModeToggle className="size-8 group-data-[collapsible=icon]:opacity-0" />
 					</SidebarMenuItem>
 				</SidebarMenu>
 				<Separator />
