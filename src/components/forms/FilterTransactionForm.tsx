@@ -25,7 +25,9 @@ export function FilterTransactionForm({ categories }: ITransactionFilterProps) {
 							setFilters({ ...filters, selectedCategory: null })
 						}}
 						className={`rounded-full px-3 py-1.5 font-medium text-sm transition-colors ${
-							selectedCategory === null ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+							selectedCategory === null
+								? 'bg-primary text-primary-foreground'
+								: 'bg-muted text-muted-foreground hover:bg-accent'
 						}`}
 					>
 						Todas
@@ -37,7 +39,7 @@ export function FilterTransactionForm({ categories }: ITransactionFilterProps) {
 							onClick={() => setFilters({ ...filters, selectedCategory: category })}
 							className={`rounded-full px-3 py-1.5 font-medium text-sm transition-colors ${
 								selectedCategory === category
-									? 'bg-blue-500 text-white'
+									? 'bg-primary text-primary-foreground'
 									: `${getCategoryColor(category)} hover:opacity-90`
 							}`}
 						>
