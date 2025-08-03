@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/auth/useAuth'
 import { cn } from '@/lib/utils'
 
 const signUpFormSchema = z.object({
+	name: z.string().min(3, { message: 'Mínimo 3 caracteres' }).max(50, { message: 'Máximo 50 caracteres' }),
 	email: z.email({ message: 'O e-mail é inválido' }),
 	password: z.string().min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
 })
@@ -25,13 +26,14 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
 	} = useForm<SignUpFormInputs>({
 		resolver: zodResolver(signUpFormSchema),
 		defaultValues: {
+			name: '',
 			email: '',
 			password: '',
 		},
 	})
 
-	const onSubmit = ({ email, password }: SignUpFormInputs) => {
-		signUp.mutate({ email, password })
+	const onSubmit = ({ name, email, password }: SignUpFormInputs) => {
+		signUp.mutate({ name, email, password })
 	}
 
 	return (
@@ -42,8 +44,13 @@ export function SignUpForm({ className, ...props }: React.ComponentProps<'form'>
 			</div>
 			<div className="grid gap-6">
 				<div className="grid gap-3">
+					<Label htmlFor="name">Nome</Label>
+					<Input id="name" type="text" placeholder="Batman da Silva" autoComplete="name" {...register('name')} />
+					{errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+				</div>
+				<div className="grid gap-3">
 					<Label htmlFor="email">Email</Label>
-					<Input id="email" type="text" placeholder="exemplo@email.com" autoComplete="email" {...register('email')} />
+					<Input id="email" type="text" placeholder="batman@dc.com" autoComplete="email" {...register('email')} />
 					{errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 				</div>
 				<div className="grid gap-3">
