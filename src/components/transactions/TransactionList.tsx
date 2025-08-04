@@ -47,11 +47,7 @@ export function TransactionList() {
 	}
 
 	if (filtered.length === 0) {
-		return (
-			<div className="rounded-lg border border-gray-200 p-6 text-center text-gray-500">
-				Nenhuma transação encontrada
-			</div>
-		)
+		return <div className="rounded-lg border p-6 text-center text-gray-500">Nenhuma transação encontrada</div>
 	}
 
 	return (

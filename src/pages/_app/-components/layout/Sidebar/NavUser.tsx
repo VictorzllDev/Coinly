@@ -1,4 +1,5 @@
 import { IconDotsVertical, IconLogout, IconUserCircle } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
 	DropdownMenu,
@@ -61,10 +62,12 @@ export function NavUser({ user }: NavUserProps) {
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem disabled>
-								<IconUserCircle />
-								Minha Conta
-							</DropdownMenuItem>
+							<Link to="/my-account">
+								<DropdownMenuItem>
+									<IconUserCircle />
+									Minha Conta
+								</DropdownMenuItem>
+							</Link>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={() => logout.mutate()} disabled={logout.isPending}>

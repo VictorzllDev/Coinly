@@ -17,7 +17,9 @@ export function Header() {
 
 				<div className="ml-auto flex items-center gap-2">
 					<Button variant="ghost" size="sm" className="hidden sm:flex">
-						GitHub
+						<a href="https://github.com/VictorzllDev/Coinly" rel="noreferrer" target="_blank">
+							GitHub
+						</a>
 					</Button>
 				</div>
 			</div>
