@@ -1,6 +1,5 @@
-import { type Icon, IconCirclePlusFilled } from '@tabler/icons-react'
+import type { Icon } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
-import { ModeToggle } from '@/components/shared/ModeToggle'
 import { Separator } from '@/components/ui/separator'
 import {
 	SidebarGroup,
@@ -22,18 +21,6 @@ export function NavMain({
 	return (
 		<SidebarGroup>
 			<SidebarGroupContent className="flex flex-col gap-2">
-				<SidebarMenu>
-					<SidebarMenuItem className="flex items-center gap-2">
-						<SidebarMenuButton
-							tooltip="New Transaction"
-							className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-						>
-							<IconCirclePlusFilled />
-							<span>Nova Transacao</span>
-						</SidebarMenuButton>
-						<ModeToggle className="size-8 group-data-[collapsible=icon]:opacity-0" />
-					</SidebarMenuItem>
-				</SidebarMenu>
 				<Separator />
 				<SidebarMenu>
 					{items.map((item) => (

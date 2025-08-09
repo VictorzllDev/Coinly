@@ -2,6 +2,7 @@ import { IconDashboard, IconListDetails, IconSettings } from '@tabler/icons-reac
 import { Link } from '@tanstack/react-router'
 import { WalletIcon } from 'lucide-react'
 import type * as React from 'react'
+import { ModeToggle } from '@/components/shared/ModeToggle'
 import {
 	Sidebar,
 	SidebarContent,
@@ -46,13 +47,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		<Sidebar collapsible="offcanvas" {...props}>
 			<SidebarHeader>
 				<SidebarMenu>
-					<SidebarMenuItem>
+					<SidebarMenuItem className="flex items-center gap-2">
 						<SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
 							<Link to="/">
 								<WalletIcon className="size-5" />
 								Coinly
 							</Link>
 						</SidebarMenuButton>
+						<ModeToggle className="size-8 group-data-[collapsible=icon]:opacity-0" />
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
